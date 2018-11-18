@@ -3,6 +3,11 @@
 #include <stdint.h>
 #include <x86intrin.h>
 
+namespace traits {
+    template<class T> struct bit_width { static constexpr size_t value = T::bit_width; };
+    template<> struct bit_width<uint64_t> { static constexpr size_t value = 64; };
+} // namespace traits
+
 using CarryFlag = bool;
 
 inline CarryFlag producecarry(uint64_t& x, uint64_t y) {
@@ -29,6 +34,9 @@ struct Wider {
     Int64 lo;
     Int64 hi;
 
+    static constexpr size_t bit_width = 2 * traits::bit_width<Int64>::value;
+
+    constexpr Wider() = default;
     constexpr explicit Wider(int s) noexcept : lo(s), hi((s < 0) ? -1 : 0) {}
     constexpr operator bool() const noexcept { return bool(lo | hi); }
 
