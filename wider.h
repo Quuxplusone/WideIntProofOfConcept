@@ -3,10 +3,10 @@
 #include <stdint.h>
 #include <x86intrin.h>
 
-namespace traits {
+namespace wider_traits {
     template<class T> struct bit_width { static constexpr size_t value = T::bit_width; };
     template<> struct bit_width<uint64_t> { static constexpr size_t value = 64; };
-} // namespace traits
+} // namespace wider_traits
 
 using CarryFlag = bool;
 
@@ -34,7 +34,7 @@ struct Wider {
     Int64 lo;
     Int64 hi;
 
-    static constexpr size_t bit_width = 2 * traits::bit_width<Int64>::value;
+    static constexpr size_t bit_width = 2 * wider_traits::bit_width<Int64>::value;
 
     constexpr Wider() = default;
     constexpr explicit Wider(int s) noexcept : lo(s), hi((s < 0) ? -1 : 0) {}
@@ -119,6 +119,8 @@ struct Wider {
     friend bool operator!(const Wider& x) { return !bool(x); }
 };
 
+namespace wider_tests {
+
 using Uint128 = Wider<uint64_t>;
 using Uint256 = Wider<Uint128>;
 using Uint512 = Wider<Uint256>;
@@ -153,3 +155,5 @@ struct Tests {
 template struct Tests<Uint128>;
 template struct Tests<__uint128_t>;
 //template struct Tests<Uint512>;
+
+} // namespace wider_tests
