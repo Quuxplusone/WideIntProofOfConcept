@@ -7,14 +7,17 @@
 
 namespace wider_detail {
 
+template<class T> constexpr void multiply_by(T& t, int (*)[10]) { t *= 10; }
+template<class T> constexpr void multiply_by(T& t, int (*)[16]) { t <<= 4; }
+
 template<class T, int Base>
 constexpr T parse_it2(const char *first, const char *last) {
+    using Tag = int(*)[Base];
     T result = T(0);
     for (const char *p = first; p != last; ++p) {
         char c = *p;
         if ('0' <= c && c <= '9') {
-            if constexpr (Base == 16) result <<= 4;
-            else result *= 10;
+            multiply_by(result, Tag{});
             result += T(c - '0');
         } else if (Base == 16 && 'a' <= c && c <= 'f') {
             result <<= 4;
