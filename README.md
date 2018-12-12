@@ -33,8 +33,8 @@ For my `Uint128` built from a pair of `uint64_t`:
 | ---------------------- | ------------- | ----------- | --------- | -------
 | plus                   | OK            | extra mov   | extra mov | bad
 | pluseq                 | OK            | bad         | bad       | bad
-| minus                  | extra mov     | extra mov   | bad       | bad
-| minuseq                | extra mov     | bad         | bad       | bad
+| minus                  | OK            | extra mov   | bad       | bad
+| minuseq                | OK            | bad         | bad       | bad
 | xor_                   | OK            | OK          | OK        | OK
 | xoreq                  | OK            | OK          | OK        | OK
 | or_                    | OK            | OK          | OK        | OK
