@@ -2,10 +2,45 @@
 
 #include <stdint.h>
 #include <x86intrin.h>
+#include <utility>
+#include <tuple>
 
 namespace wider_traits {
+
     template<class T> struct bit_width { static constexpr size_t value = T::bit_width; };
     template<> struct bit_width<uint64_t> { static constexpr size_t value = 64; };
+
+    template<class T> struct array_helper {
+        template<class... Ints>
+        static T from_array(Ints... ints) {
+            return T::from_array(std::make_index_sequence<sizeof...(Ints) / 2>(), ints...);
+        }
+        template<class F>
+        static auto with_array(const T& t, const F& f) {
+            using Int64 = std::decay_t<decltype(t.lo)>;
+            return array_helper<Int64>::with_array(t.lo, [&](auto... los) {
+                return array_helper<Int64>::with_array(t.hi, [&](auto... his) {
+                    return f(los..., his...);
+                });
+            });
+        }
+    };
+    template<> struct array_helper<uint64_t> {
+        static uint64_t from_array(uint64_t x) {
+            return x;
+        }
+        template<class F>
+        static auto with_array(uint64_t x, const F& f) {
+            return f(x);
+        }
+    };
+
+    template<size_t I, class... Ts>
+    uint64_t& get_helper(Ts&&... ts) {
+        std::tuple<Ts&&...> tuple(std::forward<Ts>(ts)...);
+        return std::get<I>(tuple);
+    }
+
 } // namespace wider_traits
 
 using CarryFlag = bool;
@@ -29,6 +64,21 @@ inline CarryFlag subborrow(CarryFlag cf, uint64_t& x, uint64_t y) {
     return _subborrow_u64(cf, x, y, (unsigned long long*)&x);
 }
 
+inline uint64_t __shiftleft128(uint64_t low, uint64_t high, int n)
+{
+    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
+    v <<= (n & 63);
+    v >>= 64;
+    return v;
+}
+
+inline uint64_t __shiftright128(uint64_t low, uint64_t high, int n)
+{
+    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
+    v >>= (n & 63);
+    return v;
+}
+
 template<class Int64>
 struct Wider {
     Int64 lo;
@@ -39,6 +89,14 @@ struct Wider {
     constexpr Wider() = default;
     constexpr explicit Wider(int s) noexcept : lo(s), hi((s < 0) ? -1 : 0) {}
     constexpr operator bool() const noexcept { return bool(lo | hi); }
+
+    template<size_t... Indices, class... Ints>
+    static Wider from_array(std::index_sequence<Indices...>, Ints... ints) {
+        Wider w;
+        w.lo = wider_traits::array_helper<Int64>::from_array(wider_traits::get_helper<Indices>(ints...)...);
+        w.hi = wider_traits::array_helper<Int64>::from_array(wider_traits::get_helper<Indices + sizeof...(Indices)>(ints...)...);
+        return w;
+    }
 
     friend CarryFlag producecarry(Wider& x, const Wider& y) {
         return addcarry(producecarry(x.lo, y.lo), x.hi, y.hi);
@@ -60,41 +118,75 @@ struct Wider {
         return cf;
     }
 
-    friend Wider& operator<<=(Wider& x, int y) {
-#ifdef ASSERTS
-        if (!(0 <= y && y < bit_width)) __builtin_unreachable();
-        if (y & -(1u << bit_width)) __builtin_unreachable();
-#endif
-        if (y >= bit_width/2) {
-            y &= (bit_width/2 - 1);
-            x.hi = x.lo << y;
-            x.lo = Int64{0};
-        } else if (y) {
-            int shift = (bit_width/2 - y) % (bit_width/2);
-            Int64 temp = (x.lo >> shift);
-            x.lo <<= y;
-            x.hi <<= y;
-            x.hi |= temp;
-        }
-        return x;
+    template<size_t... Is, class... Ts>
+    static void shift_left(int n, std::index_sequence<Is...>, Ts&&... parts) {
+        using wider_traits::get_helper;
+        int xx[] = {
+            [&](){
+                constexpr size_t I = sizeof...(Is) - Is - 1;
+                get_helper<I + 1>(parts...) = __shiftleft128(
+                    get_helper<I>(parts...),
+                    get_helper<I + 1>(parts...),
+                    n
+                );
+                return 0;
+            }() ...
+        };
+        get_helper<0>(parts...) <<= (n & 63);
     }
-    friend Wider& operator>>=(Wider& x, int y) {
-#ifdef ASSERTS
-        if (!(0 <= y && y < bit_width)) __builtin_unreachable();
-        if (y & -(1u << bit_width)) __builtin_unreachable();
-#endif
-        if (y >= bit_width/2) {
-            y &= (bit_width/2 - 1);
-            x.lo = x.hi >> y;
-            x.hi = Int64{0};
-        } else if (y) {
-            int shift = (bit_width/2 - y) % (bit_width/2);
-            Int64 temp = (x.hi << shift);
-            x.hi >>= y;
-            x.lo >>= y;
-            x.lo |= temp;
-        }
-        return x;
+
+    template<size_t... Is, class... Ts>
+    static void shift_right(int n, std::index_sequence<Is...>, Ts&&... parts) {
+        using wider_traits::get_helper;
+        int xx[] = {
+            [&](){
+                get_helper<Is>(parts...) = __shiftright128(
+                    get_helper<Is>(parts...),
+                    get_helper<Is + 1>(parts...),
+                    n
+                );
+                return 0;
+            }() ...
+        };
+        get_helper<sizeof...(Is)>(parts...) >>= (n & 63);
+    }
+
+    friend Wider operator<<(const Wider& a, int n) {
+        return wider_traits::array_helper<Wider>::with_array(a, [n](auto... parts) {
+            shift_left(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
+            uint64_t *ps[] = { &parts... };
+            for (int shift = 1; shift < sizeof...(parts); shift *= 2) {
+                if (n & (shift * 64)) {
+                    for (int i = sizeof...(parts) - 1; i >= 0; --i) {
+                        if (i >= shift) {
+                            *ps[i] = *ps[i - shift];
+                        } else {
+                            *ps[i] = 0;
+                        }
+                    }
+                }
+            }
+            return wider_traits::array_helper<Wider>::from_array( parts... );
+        });
+    }
+
+    friend Wider operator>>(const Wider& a, int n) {
+        return wider_traits::array_helper<Wider>::with_array(a, [n](auto... parts) {
+            shift_right(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
+            uint64_t *ps[] = { &parts... };
+            for (int shift = 1; shift < sizeof...(parts); shift *= 2) {
+                if (n & (shift * 64)) {
+                    for (int i = 0; i < sizeof...(parts); ++i) {
+                        if (i + shift < sizeof...(parts)) {
+                            *ps[i] = *ps[i + shift];
+                        } else {
+                            *ps[i] = 0;
+                        }
+                    }
+                }
+            }
+            return wider_traits::array_helper<Wider>::from_array( parts... );
+        });
     }
 
     friend Wider& operator+=(Wider& x, const Wider& y) { (void)producecarry(x, y); return x; }
@@ -107,8 +199,8 @@ struct Wider {
     friend Wider operator^(Wider x, const Wider& y) { x ^= y; return x; }
     friend Wider operator&(Wider x, const Wider& y) { x &= y; return x; }
     friend Wider operator|(Wider x, const Wider& y) { x |= y; return x; }
-    friend Wider operator<<(Wider x, int y) { x <<= y; return x; }
-    friend Wider operator>>(Wider x, int y) { x >>= y; return x; }
+    friend Wider& operator<<=(Wider& x, int y) { x = (x << y); return x; }
+    friend Wider& operator>>=(Wider& x, int y) { x = (x >> y); return x; }
 
     friend bool operator<(Wider x, const Wider& y) { return produceborrow(x, y); }
     friend bool operator>(const Wider& x, const Wider& y) { return (y < x); }
