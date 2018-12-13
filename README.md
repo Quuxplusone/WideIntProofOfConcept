@@ -1,7 +1,7 @@
 Wide Integer Math (Proof of Concept)
 ------------------------------------
 
-All numbers produced from Godbolt Compiler Explorer, using `-O3 -std=c++11`.
+All numbers produced from Godbolt Compiler Explorer, using `-O3 -std=c++14`.
 
 For the builtin `__uint128_t`:
 
@@ -17,6 +17,10 @@ For the builtin `__uint128_t`:
 | oreq                   | OK            | OK          | OK        | OK
 | and_                   | OK            | OK          | OK        | OK
 | andeq                  | OK            | OK          | OK        | OK
+| shl                    | extra mov     | extra mov   | OK        | OK
+| shleq                  | extra mov     | extra mov   | OK        | OK
+| shr                    | extra mov     | extra mov   | OK        | OK
+| shreq                  | extra mov     | extra mov   | OK        | OK
 | lt                     | OK            | OK          | OK        | bad
 | leq                    | OK            | OK          | extra mov | bad
 | gt                     | OK            | OK          | extra mov | bad
@@ -25,7 +29,6 @@ For the builtin `__uint128_t`:
 | neq                    | weird SSE     | weird SSE   | OK        | OK
 | not_                   | OK            | OK          | OK        | OK
 | bool_                  | OK            | OK          | OK        | OK
-
 
 For my `Uint128` built from a pair of `uint64_t`:
 
@@ -41,6 +44,10 @@ For my `Uint128` built from a pair of `uint64_t`:
 | oreq                   | OK            | OK          | OK        | OK
 | and_                   | OK            | OK          | OK        | OK
 | andeq                  | OK            | OK          | OK        | OK
+| shl                    | OK            | bad         | worse     | bad
+| shleq                  | OK            | bad         | worse     | bad
+| shr                    | OK            | bad         | worse     | bad
+| shreq                  | OK            | bad         | worse     | bad
 | lt                     | bad           | bad         | bad       | bad
 | leq                    | bad           | bad         | bad       | bad
 | gt                     | bad           | bad         | bad       | bad
@@ -64,11 +71,15 @@ For my `Uint256` built from a pair of `__uint128_t`:
 | oreq                   | OK            | OK          | OK        | OK
 | and_                   | OK            | OK          | OK        | OK
 | andeq                  | OK            | OK          | OK        | OK
+| shl                    | OK?           | bad         | worse     | bad
+| shleq                  | OK?           | bad         | worse     | bad
+| shr                    | OK            | bad         | worse     | bad
+| shreq                  | OK            | bad         | worse     | bad
 | lt                     | OK            | bad         | bad       | bad
 | leq                    | OK            | bad         | bad       | bad
 | gt                     | OK            | bad         | bad       | bad
 | geq                    | OK            | bad         | bad       | bad
-| eq                     | OK            | bad         | OK        | OK
-| neq                    | OK            | bad         | OK        | OK
-| not_                   | OK            | OK          | OK        | OK
-| bool_                  | OK            | OK          | OK        | OK
+| eq                     | weird SSE     | bad         | OK        | OK
+| neq                    | weird SSE     | bad         | OK        | OK
+| not_                   | weird SSE     | OK          | OK        | OK
+| bool_                  | weird SSE     | OK          | OK        | OK
