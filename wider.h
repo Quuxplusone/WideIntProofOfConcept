@@ -2,10 +2,13 @@
 
 #include <stdint.h>
 #include <x86intrin.h>
-#include <utility>
 #include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace wider_traits {
+
+    template<size_t K> using index_constant = std::integral_constant<size_t, K>;
 
     template<class T> struct bit_width { static constexpr size_t value = T::bit_width; };
     template<> struct bit_width<uint64_t> { static constexpr size_t value = 64; };
@@ -17,7 +20,7 @@ namespace wider_traits {
         }
         template<class F>
         static auto with_array(const T& t, const F& f) {
-            using Int64 = std::decay_t<decltype(t.lo)>;
+            using Int64 = typename T::half_type;
             return array_helper<Int64>::with_array(t.lo, [&](auto... los) {
                 return array_helper<Int64>::with_array(t.hi, [&](auto... his) {
                     return f(los..., his...);
@@ -85,6 +88,7 @@ struct Wider {
     Int64 hi;
 
     static constexpr size_t bit_width = 2 * wider_traits::bit_width<Int64>::value;
+    using half_type = Int64;
 
     constexpr Wider() = default;
     constexpr explicit Wider(int s) noexcept : lo(s), hi((s < 0) ? -1 : 0) {}
@@ -122,15 +126,14 @@ struct Wider {
     static void shift_left(int n, std::index_sequence<Is...>, Ts&&... parts) {
         using wider_traits::get_helper;
         int xx[] = {
-            [&](){
-                constexpr size_t I = sizeof...(Is) - Is - 1;
+            [&](auto I) {
                 get_helper<I + 1>(parts...) = __shiftleft128(
                     get_helper<I>(parts...),
                     get_helper<I + 1>(parts...),
                     n
                 );
                 return 0;
-            }() ...
+            }(wider_traits::index_constant<sizeof...(Is) - Is - 1>()) ...
         };
         get_helper<0>(parts...) <<= (n & 63);
     }
@@ -139,14 +142,14 @@ struct Wider {
     static void shift_right(int n, std::index_sequence<Is...>, Ts&&... parts) {
         using wider_traits::get_helper;
         int xx[] = {
-            [&](){
-                get_helper<Is>(parts...) = __shiftright128(
-                    get_helper<Is>(parts...),
-                    get_helper<Is + 1>(parts...),
+            [&](auto I) {
+                get_helper<I>(parts...) = __shiftright128(
+                    get_helper<I>(parts...),
+                    get_helper<I + 1>(parts...),
                     n
                 );
                 return 0;
-            }() ...
+            }(wider_traits::index_constant<Is>()) ...
         };
         get_helper<sizeof...(Is)>(parts...) >>= (n & 63);
     }
