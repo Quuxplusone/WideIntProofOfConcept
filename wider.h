@@ -126,14 +126,14 @@ struct Wider {
     static void shift_left(int n, std::index_sequence<Is...>, Ts&&... parts) {
         using wider_traits::get_helper;
         int xx[] = {
-            [&](auto I) {
+            [n](auto I, auto&&... parts) {
                 get_helper<I + 1>(parts...) = __shiftleft128(
                     get_helper<I>(parts...),
                     get_helper<I + 1>(parts...),
                     n
                 );
                 return 0;
-            }(wider_traits::index_constant<sizeof...(Is) - Is - 1>()) ...
+            }(wider_traits::index_constant<sizeof...(Is) - Is - 1>(), parts...) ...
         };
         get_helper<0>(parts...) <<= (n & 63);
     }
@@ -142,14 +142,14 @@ struct Wider {
     static void shift_right(int n, std::index_sequence<Is...>, Ts&&... parts) {
         using wider_traits::get_helper;
         int xx[] = {
-            [&](auto I) {
+            [n](auto I, auto&&... parts) {
                 get_helper<I>(parts...) = __shiftright128(
                     get_helper<I>(parts...),
                     get_helper<I + 1>(parts...),
                     n
                 );
                 return 0;
-            }(wider_traits::index_constant<Is>()) ...
+            }(wider_traits::index_constant<Is>(), parts...) ...
         };
         get_helper<sizeof...(Is)>(parts...) >>= (n & 63);
     }
