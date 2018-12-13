@@ -1,10 +1,29 @@
 #pragma once
 
 #include <stdint.h>
-#include <x86intrin.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#ifdef _MSC_VER
+
+#include <intrin.h>
+
+#else // _MSC_VER
+
+#include <x86intrin.h>
+
+inline uint64_t __shiftleft128(uint64_t low, uint64_t high, int n) {
+    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
+    return (v << (n & 63)) >> 64;
+}
+
+inline uint64_t __shiftright128(uint64_t low, uint64_t high, int n) {
+    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
+    return v >> (n & 63);
+}
+
+#endif // _MSC_VER
 
 namespace wider_traits {
 
@@ -65,21 +84,6 @@ inline CarryFlag produceborrow(uint64_t& x, uint64_t y) {
 
 inline CarryFlag subborrow(CarryFlag cf, uint64_t& x, uint64_t y) {
     return _subborrow_u64(cf, x, y, (unsigned long long*)&x);
-}
-
-inline uint64_t __shiftleft128(uint64_t low, uint64_t high, int n)
-{
-    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
-    v <<= (n & 63);
-    v >>= 64;
-    return v;
-}
-
-inline uint64_t __shiftright128(uint64_t low, uint64_t high, int n)
-{
-    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
-    v >>= (n & 63);
-    return v;
 }
 
 template<class Int64>
