@@ -272,22 +272,22 @@ using Uint1024 = Wider<Uint512>;
 
 template<class T>
 struct Tests {
-    //static void pluseq(T *p, const T *q)     { *p += *q; }
     //static void plus(T *p, const T *q)       { *p = *p + *q; }
-    //static void minuseq(T *p, const T *q)    { *p -= *q; }
+    //static void pluseq(T *p, const T *q)     { *p += *q; }
     //static void minus(T *p, const T *q)      { *p = *p - *q; }
-    //static void muleq(T *p, const T *q)      { *p *= *q; }
+    //static void minuseq(T *p, const T *q)    { *p -= *q; }
     //static void mul(T *p, const T *q)        { *p = *p * *q; }
-    //static void xoreq(T *p, const T *q)      { *p ^= *q; }
+    //static void muleq(T *p, const T *q)      { *p *= *q; }
     //static void xor_(T *p, const T *q)       { *p = *p ^ *q; }
-    //static void andeq(T *p, const T *q)      { *p &= *q; }
+    //static void xoreq(T *p, const T *q)      { *p ^= *q; }
     //static void and_(T *p, const T *q)       { *p = *p & *q; }
-    //static void oreq(T *p, const T *q)       { *p |= *q; }
+    //static void andeq(T *p, const T *q)      { *p &= *q; }
     //static void or_(T *p, const T *q)        { *p = *p | *q; }
-    //static void shleq(T *p, int q)           { *p <<= q; }
+    //static void oreq(T *p, const T *q)       { *p |= *q; }
     //static void shl(T *p, int q)             { *p = *p << q; }
-    //static void shreq(T *p, int q)           { *p >>= q; }
+    //static void shleq(T *p, int q)           { *p <<= q; }
     //static void shr(T *p, int q)             { *p = *p >> q; }
+    //static void shreq(T *p, int q)           { *p >>= q; }
     //static bool lt(const T *p, const T *q)   { return *p < *q; }
     //static bool leq(const T *p, const T *q)  { return *p <= *q; }
     //static bool gt(const T *p, const T *q)   { return *p > *q; }
