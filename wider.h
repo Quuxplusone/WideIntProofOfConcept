@@ -86,6 +86,18 @@ inline CarryFlag subborrow(CarryFlag cf, uint64_t& x, uint64_t y) {
     return _subborrow_u64(cf, x, y, (unsigned long long*)&x);
 }
 
+#ifdef __BMI2__
+inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
+    return _mulx_u64(a, b, (unsigned long long*)rhi);
+}
+#else
+inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
+    __uint128_t r = __uint128_t(a) * __uint128_t(b);
+    *rhi = (r >> 64);
+    return r;
+}
+#endif
+
 template<class Int64>
 struct Wider {
     Int64 lo;
@@ -124,6 +136,38 @@ struct Wider {
         cf = subborrow(cf, x.lo, y.lo);
         cf = subborrow(cf, x.hi, y.hi);
         return cf;
+    }
+
+    friend Wider mulxu(const Wider& a, const Wider& b, Wider *rhi)
+    {
+        Wider<Wider> result;
+        Wider temp;
+        temp.lo = mulxu(a.lo, b.lo, &temp.hi);
+        result.lo.lo = temp.lo;
+        result.lo.hi = temp.hi;
+        temp.lo = mulxu(a.hi, b.hi, &temp.hi);
+        result.hi.lo = temp.lo;
+        result.hi.hi = temp.hi;
+        temp.lo = mulxu(a.lo, b.hi, &temp.hi);
+        bool cf = false;
+        cf = addcarry(cf, result.lo.hi, temp.lo);
+        cf = addcarry(cf, result.hi.lo, temp.hi);
+        result.hi.hi += Int64(int(cf));
+        temp.lo = mulxu(a.hi, b.lo, &temp.hi);
+        cf = false;
+        cf = addcarry(cf, result.lo.hi, temp.lo);
+        cf = addcarry(cf, result.hi.lo, temp.hi);
+        result.hi.hi += Int64(int(cf));
+        *rhi = result.hi;
+        return result.lo;
+    }
+
+    friend Wider operator*(const Wider& a, const Wider& b) {
+        Wider result;
+        result.lo = mulxu(a.lo, b.lo, &result.hi);
+        result.hi += (a.lo * b.hi);
+        result.hi += (a.hi * b.lo);
+        return result;
     }
 
     template<size_t... Is, class... Ts>
@@ -198,6 +242,7 @@ struct Wider {
 
     friend Wider& operator+=(Wider& x, const Wider& y) { (void)producecarry(x, y); return x; }
     friend Wider& operator-=(Wider& x, const Wider& y) { (void)produceborrow(x, y); return x; }
+    friend Wider& operator*=(Wider& x, const Wider& y) { x = (x * y); return x; }
     friend Wider& operator^=(Wider& x, const Wider& y) { x.lo ^= y.lo; x.hi ^= y.hi; return x; }
     friend Wider& operator&=(Wider& x, const Wider& y) { x.lo &= y.lo; x.hi &= y.hi; return x; }
     friend Wider& operator|=(Wider& x, const Wider& y) { x.lo |= y.lo; x.hi |= y.hi; return x; }
@@ -227,10 +272,12 @@ using Uint1024 = Wider<Uint512>;
 
 template<class T>
 struct Tests {
-    //static void pluseq(T *p, const T *q)  { *p += *q; }
+    //static void pluseq(T *p, const T *q)     { *p += *q; }
     //static void plus(T *p, const T *q)       { *p = *p + *q; }
-    //static void minuseq(T *p, const T *q) { *p -= *q; }
+    //static void minuseq(T *p, const T *q)    { *p -= *q; }
     //static void minus(T *p, const T *q)      { *p = *p - *q; }
+    //static void muleq(T *p, const T *q)      { *p *= *q; }
+    //static void mul(T *p, const T *q)        { *p = *p * *q; }
     //static void xoreq(T *p, const T *q)      { *p ^= *q; }
     //static void xor_(T *p, const T *q)       { *p = *p ^ *q; }
     //static void andeq(T *p, const T *q)      { *p &= *q; }
