@@ -98,6 +98,35 @@ inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
 }
 #endif
 
+inline int countleadingzeros(uint64_t x) {
+    return __builtin_clzll(x);
+}
+
+inline int countleadingzeros(__uint128_t x) {
+    int lo = (63 ^ countleadingzeros(uint64_t(x))) + 64;
+    int hi = 63 ^ countleadingzeros(uint64_t(x >> 64));
+    return 63 ^ ((x >> 64) ? hi : lo);
+}
+
+template<class T>
+T divmod(T a, const T& b, T *remainder)
+{
+    int leading_zeros = countleadingzeros(b);
+    T subtrahend = b << leading_zeros;
+    T digit = T(1) << leading_zeros;
+    T quotient{0};
+    while (digit) {
+        if (subtrahend <= a) {
+            a -= subtrahend;
+            quotient |= digit;
+        }
+        subtrahend >>= 1;
+        digit >>= 1;
+    }
+    *remainder = a;
+    return quotient;
+}
+
 template<class Int64>
 struct Wider {
     Int64 lo;
@@ -183,6 +212,7 @@ struct Wider {
                 return 0;
             }(wider_traits::index_constant<sizeof...(Is) - Is - 1>(), parts...) ...
         };
+        (void)xx;
         get_helper<0>(parts...) <<= (n & 63);
     }
 
@@ -199,6 +229,7 @@ struct Wider {
                 return 0;
             }(wider_traits::index_constant<Is>(), parts...) ...
         };
+        (void)xx;
         get_helper<sizeof...(Is)>(parts...) >>= (n & 63);
     }
 
@@ -206,7 +237,7 @@ struct Wider {
         return wider_traits::array_helper<Wider>::with_array(a, [n](auto... parts) {
             shift_left(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
             uint64_t *ps[] = { &parts... };
-            for (int shift = 1; shift < sizeof...(parts); shift *= 2) {
+            for (int shift = 1; shift < int(sizeof...(parts)); shift *= 2) {
                 if (n & (shift * 64)) {
                     for (int i = sizeof...(parts) - 1; i >= 0; --i) {
                         if (i >= shift) {
@@ -225,10 +256,10 @@ struct Wider {
         return wider_traits::array_helper<Wider>::with_array(a, [n](auto... parts) {
             shift_right(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
             uint64_t *ps[] = { &parts... };
-            for (int shift = 1; shift < sizeof...(parts); shift *= 2) {
+            for (int shift = 1; shift < int(sizeof...(parts)); shift *= 2) {
                 if (n & (shift * 64)) {
-                    for (int i = 0; i < sizeof...(parts); ++i) {
-                        if (i + shift < sizeof...(parts)) {
+                    for (int i = 0; i < int(sizeof...(parts)); ++i) {
+                        if (i + shift < int(sizeof...(parts))) {
                             *ps[i] = *ps[i + shift];
                         } else {
                             *ps[i] = 0;
@@ -240,9 +271,31 @@ struct Wider {
         });
     }
 
+    friend int countleadingzeros(const Wider& x) {
+        constexpr int mask = bit_width - 1;
+        int lo = (mask ^ countleadingzeros(x.lo)) + bit_width;
+        int hi = mask ^ countleadingzeros(x.hi);
+        return mask ^ (x.hi ? hi : lo);
+    }
+
+    friend Wider operator/(const Wider& a, const Wider& b) {
+        Wider remainder;
+        return divmod(a, b, &remainder);
+    }
+    friend Wider operator%(const Wider& a, const Wider& b) {
+        Wider remainder;
+        (void)divmod(a, b, &remainder);
+        return remainder;
+    }
+    friend Wider& operator%=(Wider& a, const Wider& b) {
+        (void)divmod(a, b, &a);
+        return a;
+    }
+
     friend Wider& operator+=(Wider& x, const Wider& y) { (void)producecarry(x, y); return x; }
     friend Wider& operator-=(Wider& x, const Wider& y) { (void)produceborrow(x, y); return x; }
     friend Wider& operator*=(Wider& x, const Wider& y) { x = (x * y); return x; }
+    friend Wider& operator/=(Wider& x, const Wider& y) { x = x / y; return x; }
     friend Wider& operator^=(Wider& x, const Wider& y) { x.lo ^= y.lo; x.hi ^= y.hi; return x; }
     friend Wider& operator&=(Wider& x, const Wider& y) { x.lo &= y.lo; x.hi &= y.hi; return x; }
     friend Wider& operator|=(Wider& x, const Wider& y) { x.lo |= y.lo; x.hi |= y.hi; return x; }
@@ -278,6 +331,10 @@ struct Tests {
     //static void minuseq(T *p, const T *q)    { *p -= *q; }
     //static void mul(T *p, const T *q)        { *p = *p * *q; }
     //static void muleq(T *p, const T *q)      { *p *= *q; }
+    //static void div(T *p, const T *q)        { *p = *p / *q; }
+    //static void diveq(T *p, const T *q)      { *p /= *q; }
+    //static void mod(T *p, const T *q)        { *p = *p % *q; }
+    //static void modeq(T *p, const T *q)      { *p %= *q; }
     //static void xor_(T *p, const T *q)       { *p = *p ^ *q; }
     //static void xoreq(T *p, const T *q)      { *p ^= *q; }
     //static void and_(T *p, const T *q)       { *p = *p & *q; }
@@ -288,6 +345,7 @@ struct Tests {
     //static void shleq(T *p, int q)           { *p <<= q; }
     //static void shr(T *p, int q)             { *p = *p >> q; }
     //static void shreq(T *p, int q)           { *p >>= q; }
+    //static int clz(T *p)                     { return countleadingzeros(*p); }
     //static bool lt(const T *p, const T *q)   { return *p < *q; }
     //static bool leq(const T *p, const T *q)  { return *p <= *q; }
     //static bool gt(const T *p, const T *q)   { return *p > *q; }

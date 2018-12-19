@@ -6,8 +6,15 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`.
 Each number indicates a naïve instruction count
 (not counting labels, but counting the `ret`) for the given member function
 of `wider_tests::Tests<T>`.
-"P" indicates perfect codegen. "sse" indicates that I'm surprised at
-the use of SSE instructions.
+"P" indicates perfect codegen.
+"sse" indicates that I'm surprised at the use of SSE instructions.
+"call" indicates failure to completely inline the code (because it's so big).
+
+"`__udivti3`" and "`__umodti3`" indicate that certain arithmetic operations on `__uint128_t`
+are delegated to a library function. The library function is macro-optimized with
+many special cases (division by small integers, division by integers with many trailing zeros,
+et cetera). In contrast, `Wider`'s `operator/` omits these special cases,
+resulting in smaller code but almost certainly slower code in common situations.
 
 For the builtin `__uint128_t`:
 
@@ -19,6 +26,10 @@ For the builtin `__uint128_t`:
 | minuseq                | 5 P           | 6           | 5 P       | 5 P
 | mul                    | 11 P          | 11 P        | 12        | 15
 | muleq                  | 11 P          | 11 P        | 12        | 15
+| div                    | __udivti3     | __udivti3   | __udivti3 | __udivti3
+| diveq                  | __udivti3     | __udivti3   | __udivti3 | __udivti3
+| mod                    | __umodti3     | __umodti3   | __umodti3 | __umodti3
+| modeq                  | __umodti3     | __umodti3   | __umodti3 | __umodti3
 | xor_                   | 5 P           | 5 P         | 5 P       | 5 P
 | xoreq                  | 5 P           | 5 P         | 5 P       | 5 P
 | or_                    | 5 P           | 5 P         | 5 P       | 5 P
@@ -29,6 +40,7 @@ For the builtin `__uint128_t`:
 | shleq                  | 13            | 13          | 12 P      | 12 P
 | shr                    | 13            | 13          | 12 P      | 12 P
 | shreq                  | 13            | 13          | 12 P      | 12 P
+| clz                    | 9             | 9           | 11        | 9
 | lt                     | 6 P           | 6 P         | 6 P       | 11
 | leq                    | 6 P           | 6 P         | 7         | 11
 | gt                     | 6 P           | 6 P         | 7         | 11
@@ -48,6 +60,10 @@ For my `Uint128` built from a pair of `uint64_t`:
 | minuseq                | 6             | 6           | 11        | 12
 | mul                    | 11 P          | 11 P        | 11 P      | 11 P
 | muleq                  | 11 P          | 11 P        | 11 P      | 11 P
+| div                    | 39            | 57          | 104 call  | 100 call
+| diveq                  | 39            | 57          | 104 call  | 100 call
+| mod                    | 32            | 53          | 102 call  | 98 call
+| modeq                  | 32            | 52          | 94 call   | 93 call
 | xor_                   | 5 sse         | 5 sse       | 5 sse     | 5 sse
 | xoreq                  | 5 sse         | 5 sse       | 5 sse     | 5 sse
 | or_                    | 5 sse         | 5 sse       | 5 sse     | 5 sse
@@ -58,6 +74,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | shleq                  | 12 P          | 14          | 25        | 19
 | shr                    | 12 P          | 14          | 22        | 17
 | shreq                  | 12 P          | 14          | 22        | 17
+| clz                    | 9             | 9           | 11        | 9
 | lt                     | 8             | 9           | 11        | 12
 | leq                    | 8             | 9           | 9         | 12
 | gt                     | 8             | 9           | 9         | 12
@@ -67,7 +84,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
 | bool_                  | 4 P           | 4 P         | 4 P       | 4 P
 
-For my `Uint256` built from a pair of `__uint128_t`:
+For my `Uint256` built from a pair of `Uint128`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
@@ -77,6 +94,10 @@ For my `Uint256` built from a pair of `__uint128_t`:
 | minuseq                | 10            | 12          | 23        | 22
 | mul                    | 60            | 74          | 62        | 84
 | muleq                  | 60            | 74          | 62        | 84
+| div                    | 177 call      | 166 call    | 264 call  | 249 call
+| diveq                  | 177 call      | 166 call    | 264 call  | 249 call
+| mod                    | 177 call      | 166 call    | 264 call  | 249 call
+| modeq                  | 170 call      | 160 call    | 257 call  | 238 call
 | xor_                   | 9 sse         | 9 sse       | 9 P       | 9 P
 | xoreq                  | 9 sse         | 9 sse       | 9 P       | 9 P
 | or_                    | 9 sse         | 9 sse       | 9 P       | 9 P
@@ -87,6 +108,7 @@ For my `Uint256` built from a pair of `__uint128_t`:
 | shleq                  | 28 P          | 39          | 68        | 61
 | shr                    | 28 P          | 40          | 68        | 61
 | shreq                  | 28 P          | 40          | 68        | 61
+| clz                    | 21            | 21          | 28        | 21
 | lt                     | 10 P          | 18          | 21        | 19
 | leq                    | 10 P          | 18          | 21        | 19
 | gt                     | 10 P          | 18          | 21        | 19
