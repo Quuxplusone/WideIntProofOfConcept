@@ -108,25 +108,6 @@ inline int countleadingzeros(__uint128_t x) {
     return 63 ^ ((x >> 64) ? hi : lo);
 }
 
-template<class T>
-T divmod(T a, const T& b, T *remainder)
-{
-    int leading_zeros = countleadingzeros(b);
-    T subtrahend = b << leading_zeros;
-    T digit = T(1) << leading_zeros;
-    T quotient{0};
-    while (digit) {
-        if (subtrahend <= a) {
-            a -= subtrahend;
-            quotient |= digit;
-        }
-        subtrahend >>= 1;
-        digit >>= 1;
-    }
-    *remainder = a;
-    return quotient;
-}
-
 template<class Int64>
 struct Wider {
     Int64 lo;
@@ -276,6 +257,23 @@ struct Wider {
         int lo = (mask ^ countleadingzeros(x.lo)) + bit_width;
         int hi = mask ^ countleadingzeros(x.hi);
         return mask ^ (x.hi ? hi : lo);
+    }
+
+    friend Wider divmod(Wider a, const Wider& b, Wider *remainder) {
+        int leading_zeros = countleadingzeros(b);
+        Wider subtrahend = b << leading_zeros;
+        Wider digit = Wider(1) << leading_zeros;
+        Wider quotient{0};
+        while (digit) {
+            if (subtrahend <= a) {
+                a -= subtrahend;
+                quotient |= digit;
+            }
+            subtrahend >>= 1;
+            digit >>= 1;
+        }
+        *remainder = a;
+        return quotient;
     }
 
     friend Wider operator/(const Wider& a, const Wider& b) {

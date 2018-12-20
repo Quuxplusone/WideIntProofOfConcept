@@ -60,10 +60,10 @@ For my `Uint128` built from a pair of `uint64_t`:
 | minuseq                | 6             | 6           | 11        | 12
 | mul                    | 11 P          | 11 P        | 11 P      | 11 P
 | muleq                  | 11 P          | 11 P        | 11 P      | 11 P
-| div                    | 39            | 57          | 104 call  | 100 call
-| diveq                  | 39            | 57          | 104 call  | 100 call
-| mod                    | 32            | 53          | 102 call  | 98 call
-| modeq                  | 32            | 52          | 94 call   | 93 call
+| div                    | 39            | 57          | 88        | 83
+| diveq                  | 39            | 57          | 88        | 82
+| mod                    | 32            | 53          | 83        | 76
+| modeq                  | 32            | 52          | 81        | 79
 | xor_                   | 5 sse         | 5 sse       | 5 sse     | 5 sse
 | xoreq                  | 5 sse         | 5 sse       | 5 sse     | 5 sse
 | or_                    | 5 sse         | 5 sse       | 5 sse     | 5 sse
@@ -94,10 +94,10 @@ For my `Uint256` built from a pair of `Uint128`:
 | minuseq                | 10            | 12          | 23        | 22
 | mul                    | 60            | 74          | 62        | 84
 | muleq                  | 60            | 74          | 62        | 84
-| div                    | 177 call      | 166 call    | 264 call  | 249 call
-| diveq                  | 177 call      | 166 call    | 264 call  | 249 call
-| mod                    | 177 call      | 166 call    | 264 call  | 249 call
-| modeq                  | 170 call      | 160 call    | 257 call  | 238 call
+| div                    | 177 call      | 166 call    | 241       | 225
+| diveq                  | 177 call      | 166 call    | 241       | 225
+| mod                    | 177 call      | 166 call    | 228       | 209
+| modeq                  | 170 call      | 160 call    | 228       | 214
 | xor_                   | 9 sse         | 9 sse       | 9 P       | 9 P
 | xoreq                  | 9 sse         | 9 sse       | 9 P       | 9 P
 | or_                    | 9 sse         | 9 sse       | 9 P       | 9 P
