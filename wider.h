@@ -317,6 +317,8 @@ struct Wider {
     friend bool operator==(const Wider& x, const Wider& y) { return !((x.lo ^ y.lo) | (x.hi ^ y.hi)); }
     friend bool operator!=(const Wider& x, const Wider& y) { return !(x == y); }
     friend bool operator!(const Wider& x) { return !bool(x); }
+    friend Wider operator-(const Wider& x) { return Wider(0) - x; }
+    friend Wider operator~(const Wider& x) { return Wider(-1) ^ x; }
 };
 
 namespace wider_tests {
@@ -361,6 +363,8 @@ struct Tests {
     //static bool neq(const T *p, const T *q)  { return *p != *q; }
     //static bool not_(const T *p)             { return !*p; }
     //static bool bool_(const T *p)            { return *p; }
+    //static void neg(T *p)                    { *p = -*p; }
+    //static void flip(T *p)                   { *p = ~*p; }
 };
 
 template struct Tests<Uint128>;

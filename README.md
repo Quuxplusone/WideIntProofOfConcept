@@ -53,6 +53,8 @@ For the builtin `__uint128_t`:
 | neq                    | 6 sse         | 6 sse       | 7 P       | 7 P
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
 | bool_                  | 4 P           | 4 P         | 4 P       | 4 P
+| neg                    | 7             | 7           | 4 P       | 4 P
+| flip                   | 3 P           | 3 P         | 3 P       | 3 P
 
 For my `Uint128` built from a pair of `uint64_t`:
 
@@ -91,6 +93,8 @@ For my `Uint128` built from a pair of `uint64_t`:
 | neq                    | 7 P           | 7 P         | 7 P       | 7 P
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
 | bool_                  | 4 P           | 4 P         | 4 P       | 4 P
+| neg                    | 10            | 13          | 13        | 14
+| flip                   | 5             | 5           | 5         | 5
 
 For my `Uint256` built from a pair of `Uint128`:
 
@@ -129,3 +133,5 @@ For my `Uint256` built from a pair of `Uint128`:
 | neq                    | 13 sse        | 17 sse      | 13 P      | 13 P
 | not_                   | 9 sse         | 6 P         | 6 P       | 6 P
 | bool_                  | 9 sse         | 6 P         | 6 P       | 6 P
+| neg                    | 16            | 27          | 25        | 27
+| flip                   | 8             | 8           | 8         | 8
