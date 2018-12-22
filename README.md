@@ -44,7 +44,7 @@ For the builtin `__uint128_t`:
 | shleq                  | 13            | 13          | 12 P      | 12 P
 | shr                    | 13            | 13          | 12 P      | 12 P
 | shreq                  | 13            | 13          | 12 P      | 12 P
-| clz                    | 9             | 9           | 11        | 9
+| clz                    | 7             | 8           | 11        | 9
 | lt                     | 6 P           | 6 P         | 6 P       | 11
 | leq                    | 6 P           | 6 P         | 7         | 11
 | gt                     | 6 P           | 6 P         | 7         | 11
@@ -82,7 +82,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | shleq                  | 12 P          | 14          | 25        | 19
 | shr                    | 12 P          | 14          | 22        | 17
 | shreq                  | 12 P          | 14          | 22        | 17
-| clz                    | 9             | 9           | 11        | 9
+| clz                    | 9             | 9           | 12        | 9
 | lt                     | 8             | 9           | 11        | 12
 | leq                    | 8             | 9           | 9         | 12
 | gt                     | 8             | 9           | 9         | 12
@@ -120,7 +120,7 @@ For my `Uint256` built from a pair of `Uint128`:
 | shleq                  | 28 P          | 39          | 68        | 61
 | shr                    | 28 P          | 40          | 68        | 61
 | shreq                  | 28 P          | 40          | 68        | 61
-| clz                    | 21            | 21          | 28        | 21
+| clz                    | 21            | 21          | 32        | 25
 | lt                     | 10 P          | 18          | 21        | 19
 | leq                    | 10 P          | 18          | 21        | 19
 | gt                     | 10 P          | 18          | 21        | 19
