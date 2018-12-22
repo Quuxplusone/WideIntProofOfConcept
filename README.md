@@ -20,6 +20,10 @@ For the builtin `__uint128_t`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
+| preinc                 | 3 P           | 5           | 3 P       | 3 P
+| postinc                | 11            | 11          | 11        | 11
+| predec                 | 3 P           | 5           | 3 P       | 3 P
+| postdec                | 11            | 11          | 11        | 11
 | plus                   | 5 P           | 6           | 5 P       | 5 P
 | pluseq                 | 5 P           | 7           | 5 P       | 5 P
 | minus                  | 5 P           | 6           | 5 P       | 5 P
@@ -54,6 +58,10 @@ For my `Uint128` built from a pair of `uint64_t`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
+| preinc                 | 5             | 5           | 5         | 5
+| postinc                | 13            | 13          | 16        | 13
+| predec                 | 8             | 8           | 8         | 10
+| postdec                | 13            | 13          | 16        | 13
 | plus                   | 5 P           | 10          | 13        | 15
 | pluseq                 | 5 P           | 6           | 6         | 12
 | minus                  | 6             | 10          | 16        | 18
@@ -88,6 +96,10 @@ For my `Uint256` built from a pair of `Uint128`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
+| preinc                 | 7             | 11          | 13        | 15
+| postinc                | 15            | 21          | 31        | 27
+| predec                 | 10            | 14          | 17        | 20
+| postdec                | 18            | 22          | 32        | 27
 | plus                   | 9 P           | 24          | 26        | 30
 | pluseq                 | 9 P           | 12          | 18        | 21
 | minus                  | 10            | 24          | 30        | 26

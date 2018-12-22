@@ -118,6 +118,7 @@ struct Wider {
 
     constexpr Wider() = default;
     constexpr explicit Wider(int s) noexcept : lo(s), hi((s < 0) ? -1 : 0) {}
+    constexpr explicit Wider(const Int64& s) noexcept : lo(s), hi(0) {}
     constexpr operator bool() const noexcept { return bool(lo | hi); }
 
     template<size_t... Indices, class... Ints>
@@ -290,6 +291,10 @@ struct Wider {
         return a;
     }
 
+    Wider& operator++() { *this += Wider(1); return *this; }
+    Wider operator++(int) { Wider r = *this; ++*this; return r; }
+    Wider& operator--() { *this -= Wider(1); return *this; }
+    Wider operator--(int) { Wider r = *this; --*this; return r; }
     friend Wider& operator+=(Wider& x, const Wider& y) { (void)producecarry(x, y); return x; }
     friend Wider& operator-=(Wider& x, const Wider& y) { (void)produceborrow(x, y); return x; }
     friend Wider& operator*=(Wider& x, const Wider& y) { x = (x * y); return x; }
@@ -323,6 +328,10 @@ using Uint1024 = Wider<Uint512>;
 
 template<class T>
 struct Tests {
+    //static void preinc(T *p)                 { ++*p; }
+    //static void postinc(T *p, T *q)          { *p = (*q)++; }
+    //static void predec(T *p)                 { --*p; }
+    //static void postdec(T *p, T *q)          { *p = (*q)--; }
     //static void plus(T *p, const T *q)       { *p = *p + *q; }
     //static void pluseq(T *p, const T *q)     { *p += *q; }
     //static void minus(T *p, const T *q)      { *p = *p - *q; }
