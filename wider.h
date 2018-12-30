@@ -6,23 +6,9 @@
 #include <utility>
 
 #ifdef _MSC_VER
-
 #include <intrin.h>
-
 #else // _MSC_VER
-
 #include <x86intrin.h>
-
-inline uint64_t __shiftleft128(uint64_t low, uint64_t high, int n) {
-    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
-    return (v << (n & 63)) >> 64;
-}
-
-inline uint64_t __shiftright128(uint64_t low, uint64_t high, int n) {
-    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
-    return v >> (n & 63);
-}
-
 #endif // _MSC_VER
 
 namespace wider_traits {
@@ -95,6 +81,25 @@ inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
     __uint128_t r = __uint128_t(a) * __uint128_t(b);
     *rhi = (r >> 64);
     return r;
+}
+#endif
+
+#ifdef _MSC_VER
+inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
+    return __shiftleft128(low, high, n);
+}
+inline uint64_t shr128(uint64_t low, uint64_t high, int n) {
+    return __shiftright128(low, high, n);
+}
+#else
+inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
+    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
+    return (v << (n & 63)) >> 64;
+}
+
+inline uint64_t shr128(uint64_t low, uint64_t high, int n) {
+    __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
+    return v >> (n & 63);
 }
 #endif
 
@@ -186,7 +191,7 @@ struct Wider {
         using wider_traits::get_helper;
         int xx[] = {
             [n](auto I, auto&&... parts) {
-                get_helper<I + 1>(parts...) = __shiftleft128(
+                get_helper<I + 1>(parts...) = shl128(
                     get_helper<I>(parts...),
                     get_helper<I + 1>(parts...),
                     n
@@ -203,7 +208,7 @@ struct Wider {
         using wider_traits::get_helper;
         int xx[] = {
             [n](auto I, auto&&... parts) {
-                get_helper<I>(parts...) = __shiftright128(
+                get_helper<I>(parts...) = shr128(
                     get_helper<I>(parts...),
                     get_helper<I + 1>(parts...),
                     n
