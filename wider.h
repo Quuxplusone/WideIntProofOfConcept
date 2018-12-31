@@ -72,46 +72,66 @@ inline CarryFlag subborrow(CarryFlag cf, uint64_t& x, uint64_t y) {
     return _subborrow_u64(cf, x, y, (unsigned long long*)&x);
 }
 
-#ifdef __BMI2__
 inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
+#if defined(WIDER_COMPLETELY_STANDARD)
+    auto hi = [](uint64_t x) { return x >> 32; };
+    auto lo = [](uint64_t x) { return uint32_t(x); };
+    uint64_t xl = lo(a);
+    uint64_t xh = hi(a);
+    uint64_t yl = lo(b);
+    uint64_t yh = hi(b);
+
+    uint64_t rhh = xh * yh;
+    uint64_t rhl = xh * yl;
+    uint64_t rlh = xl * yh;
+    uint64_t rll = xl * yl;
+
+    *rhi = rhh + hi(rhl + hi(rll)) + hi(rlh + lo(rhl + hi(rll)));
+    return a * b;
+#elif defined(_MSC_VER)
+    return _umul128(a, b, (unsigned long long*)rhi);
+#elif defined(__BMI2__)
     return _mulx_u64(a, b, (unsigned long long*)rhi);
-}
 #else
-inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
     __uint128_t r = __uint128_t(a) * __uint128_t(b);
     *rhi = (r >> 64);
     return r;
-}
 #endif
+}
 
+inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
 #ifdef _MSC_VER
-inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
     return __shiftleft128(low, high, n);
-}
-inline uint64_t shr128(uint64_t low, uint64_t high, int n) {
-    return __shiftright128(low, high, n);
-}
 #else
-inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
     __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
     return (v << (n & 63)) >> 64;
+#endif
 }
 
 inline uint64_t shr128(uint64_t low, uint64_t high, int n) {
+#ifdef _MSC_VER
+    return __shiftright128(low, high, n);
+#else
     __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
     return v >> (n & 63);
-}
 #endif
+}
 
 inline int countleadingzeros(uint64_t x) {
+#ifdef _MSC_VER
+    return __lzcnt64(x);
+#else
     return __builtin_clzll(x);
+#endif
 }
 
+#ifndef _MSC_VER
 inline int countleadingzeros(__uint128_t x) {
     int lo = (63 ^ countleadingzeros(uint64_t(x))) + 64;
     int hi = 63 ^ countleadingzeros(uint64_t(x >> 64));
     return 63 ^ ((x >> 64) ? hi : lo);
 }
+#endif
 
 template<class Int64>
 struct Wider {
