@@ -85,10 +85,10 @@ For my `Uint128` built from a pair of `uint64_t`:
 | shr                    | 12 P          | 14          | 22        | 17
 | shreq                  | 12 P          | 14          | 22        | 17
 | clz                    | 9             | 9           | 12        | 9
-| lt                     | 8             | 9           | 11        | 12
-| leq                    | 8             | 9           | 9         | 12
-| gt                     | 8             | 9           | 9         | 12
-| geq                    | 8             | 9           | 9         | 12
+| lt                     | 6 P           | 9           | 11        | 12
+| leq                    | 6 P           | 9           | 9         | 12
+| gt                     | 6 P           | 9           | 9         | 12
+| geq                    | 6 P           | 9           | 9         | 12
 | eq                     | 7 P           | 7 P         | 7 P       | 7 P
 | neq                    | 7 P           | 7 P         | 7 P       | 7 P
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
