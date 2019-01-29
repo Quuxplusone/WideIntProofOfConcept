@@ -392,8 +392,9 @@ struct Tests {
     //static void flip(T *p)                   { *p = ~*p; }
 };
 
-template struct Tests<Uint128>;
-template struct Tests<__uint128_t>;
+//template struct Tests<__uint128_t>;
+//template struct Tests<Uint128>;
+//template struct Tests<Uint256>;
 //template struct Tests<Uint512>;
 
 } // namespace wider_tests
