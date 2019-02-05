@@ -100,8 +100,8 @@ def indicate_perfect_codegen(tn, fn, lc):
         (128, 'not_'): 4,        (128, 'bool_'): 4,
         (128, 'neg'): 4,         (128, 'flip'): 3,
 
-        (256, 'preinc'): None,   (256, 'postinc'): None,
-        (256, 'predec'): None,   (256, 'postdec'): None,
+        (256, 'preinc'): 5,      (256, 'postinc'): None,
+        (256, 'predec'): 5,      (256, 'postdec'): None,
         (256, 'plus'): 9,        (256, 'pluseq'): 9,
         (256, 'minus'): 9,       (256, 'minuseq'): 9,
         (256, 'mul'): None,      (256, 'muleq'): None,

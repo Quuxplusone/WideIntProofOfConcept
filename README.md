@@ -60,8 +60,8 @@ For my `Uint128` built from a pair of `uint64_t`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
-| preinc                 | 5             | 5           | 5         | 5
-| postinc                | 13            | 13          | 15        | 13
+| preinc                 | 3 P           | 5           | 5         | 5
+| postinc                | 11            | 13          | 15        | 13
 | predec                 | 8             | 8           | 8         | 10
 | postdec                | 13            | 13          | 15        | 13
 | plus                   | 5 P           | 10          | 13        | 15
@@ -101,8 +101,8 @@ For my `Uint256` built from a pair of `Uint128`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
-| preinc                 | 7             | 11          | 13        | 15
-| postinc                | 15            | 21          | 29        | 27
+| preinc                 | 5 P           | 11          | 13        | 15
+| postinc                | 13            | 21          | 29        | 27
 | predec                 | 10            | 14          | 17        | 20
 | postdec                | 18            | 22          | 30        | 27
 | plus                   | 9 P           | 24          | 26        | 30
