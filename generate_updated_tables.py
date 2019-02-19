@@ -83,8 +83,8 @@ compiler_names = [
 
 def indicate_perfect_codegen(tn, fn, lc):
     perfect_dict = {
-        (128, 'preinc'): 3,      (128, 'postinc'): None,
-        (128, 'predec'): 3,      (128, 'postdec'): None,
+        (128, 'preinc'): 3,      (128, 'postinc'): 5,
+        (128, 'predec'): 3,      (128, 'postdec'): 5,
         (128, 'plus'): 5,        (128, 'pluseq'): 5,
         (128, 'minus'): 5,       (128, 'minuseq'): 5,
         (128, 'mul'): 11,        (128, 'muleq'): 11,
@@ -100,8 +100,8 @@ def indicate_perfect_codegen(tn, fn, lc):
         (128, 'not_'): 4,        (128, 'bool_'): 4,
         (128, 'neg'): 4,         (128, 'flip'): 3,
 
-        (256, 'preinc'): 5,      (256, 'postinc'): None,
-        (256, 'predec'): 5,      (256, 'postdec'): None,
+        (256, 'preinc'): 5,      (256, 'postinc'): 9,
+        (256, 'predec'): 5,      (256, 'postdec'): 9,
         (256, 'plus'): 9,        (256, 'pluseq'): 9,
         (256, 'minus'): 9,       (256, 'minuseq'): 9,
         (256, 'mul'): None,      (256, 'muleq'): None,

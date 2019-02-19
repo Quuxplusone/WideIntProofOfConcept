@@ -111,10 +111,10 @@ For my `Uint256` built from a pair of `Uint128`:
 | minuseq                | 10            | 12          | 23        | 22
 | mul                    | 60            | 74          | 62        | 84
 | muleq                  | 60            | 74          | 62        | 84
-| div                    | 177 call      | 166 call    | 236       | 225
-| diveq                  | 177 call      | 166 call    | 236       | 225
-| mod                    | 177 call      | 166 call    | 226       | 209
-| modeq                  | 170 call      | 160 call    | 226       | 214
+| div                    | 177 call      | 166 call    | 258 call  | 225
+| diveq                  | 177 call      | 166 call    | 258 call  | 225
+| mod                    | 177 call      | 166 call    | 258 call  | 209
+| modeq                  | 170 call      | 160 call    | 251 call  | 214
 | xor_                   | 9 P           | 9 P         | 9 P       | 9 P
 | xoreq                  | 9 P           | 9 P         | 9 P       | 9 P
 | and_                   | 9 P           | 9 P         | 9 P       | 9 P
