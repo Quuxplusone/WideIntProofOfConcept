@@ -62,12 +62,12 @@ For my `Uint128` built from a pair of `uint64_t`:
 | ---------------------- | ------------- | ----------- | --------- | -------
 | preinc                 | 3 P           | 5           | 5         | 5
 | postinc                | 11            | 13          | 15        | 13
-| predec                 | 8             | 8           | 8         | 10
-| postdec                | 13            | 13          | 15        | 13
+| predec                 | 3 P           | 8           | 8         | 10
+| postdec                | 11            | 13          | 15        | 13
 | plus                   | 5 P           | 10          | 13        | 15
 | pluseq                 | 5 P           | 6           | 6         | 12
-| minus                  | 6             | 10          | 16        | 18
-| minuseq                | 6             | 6           | 11        | 12
+| minus                  | 5 P           | 10          | 16        | 18
+| minuseq                | 5 P           | 6           | 11        | 12
 | mul                    | 11 P          | 11 P        | 11 P      | 11 P
 | muleq                  | 11 P          | 11 P        | 11 P      | 11 P
 | div                    | 39            | 57          | 87        | 82
@@ -93,7 +93,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | neq                    | 7             | 7           | 7         | 7
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
 | bool_                  | 4 P           | 4 P         | 4 P       | 4 P
-| neg                    | 10            | 13          | 13        | 14
+| neg                    | 7             | 13          | 13        | 14
 | flip                   | 5             | 5           | 5         | 5
 
 
@@ -103,12 +103,12 @@ For my `Uint256` built from a pair of `Uint128`:
 | ---------------------- | ------------- | ----------- | --------- | -------
 | preinc                 | 5 P           | 11          | 13        | 15
 | postinc                | 13            | 21          | 29        | 27
-| predec                 | 10            | 14          | 17        | 20
-| postdec                | 18            | 22          | 30        | 27
+| predec                 | 5 P           | 14          | 17        | 20
+| postdec                | 13            | 22          | 30        | 27
 | plus                   | 9 P           | 24          | 26        | 30
 | pluseq                 | 9 P           | 12          | 18        | 21
-| minus                  | 10            | 24          | 30        | 26
-| minuseq                | 10            | 12          | 23        | 22
+| minus                  | 9 P           | 24          | 30        | 26
+| minuseq                | 9 P           | 12          | 23        | 22
 | mul                    | 60            | 74          | 62        | 84
 | muleq                  | 60            | 74          | 62        | 84
 | div                    | 177 call      | 166 call    | 258 call  | 225
@@ -134,5 +134,5 @@ For my `Uint256` built from a pair of `Uint128`:
 | neq                    | 13 P          | 17          | 13 P      | 13 P
 | not_                   | 9             | 6 P         | 6 P       | 6 P
 | bool_                  | 9             | 6 P         | 6 P       | 6 P
-| neg                    | 16            | 27          | 25        | 26
+| neg                    | 13            | 27          | 25        | 26
 | flip                   | 8             | 8           | 8         | 8

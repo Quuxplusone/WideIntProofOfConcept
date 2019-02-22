@@ -115,7 +115,7 @@ def indicate_perfect_codegen(tn, fn, lc):
         (256, 'gt'): 10,         (256, 'geq'): 10,
         (256, 'eq'): 13,         (256, 'neq'): 13,
         (256, 'not_'): 6,        (256, 'bool_'): 6,
-        (256, 'neg'): None,      (256, 'flip'): None,
+        (256, 'neg'): None,      (256, 'flip'): 5,
     }
     bitwidth = 128 if ('128' in tn) else 256 if ('256' in tn) else None
     perfect_lc = perfect_dict.get((bitwidth, fn), 1)
