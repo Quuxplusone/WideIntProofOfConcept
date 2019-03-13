@@ -73,7 +73,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | div                    | 39            | 57          | 87        | 82
 | diveq                  | 39            | 57          | 87        | 82
 | mod                    | 32            | 53          | 82        | 76
-| modeq                  | 32            | 52          | 81        | 79
+| modeq                  | 32            | 52          | 79        | 79
 | xor_                   | 5 P           | 5 P         | 5 P       | 5 P
 | xoreq                  | 5 P           | 5 P         | 5 P       | 5 P
 | and_                   | 5 P           | 5 P         | 5 P       | 5 P
