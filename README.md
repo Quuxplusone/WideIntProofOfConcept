@@ -52,7 +52,7 @@ For the builtin `__uint128_t`:
 | neq                    | 6 P           | 6 P         | 7         | 7
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
 | bool_                  | 4 P           | 4 P         | 4 P       | 4 P
-| neg                    | 7             | 7           | 4 P       | 4 P
+| neg                    | 5             | 7           | 4 P       | 4 P
 | flip                   | 3 P           | 3 P         | 3 P       | 3 P
 
 
@@ -73,17 +73,17 @@ For my `Uint128` built from a pair of `uint64_t`:
 | div                    | 39            | 57          | 87        | 82
 | diveq                  | 39            | 57          | 87        | 82
 | mod                    | 32            | 53          | 82        | 76
-| modeq                  | 32            | 52          | 79        | 79
+| modeq                  | 32            | 52          | 75        | 79
 | xor_                   | 5 P           | 5 P         | 5 P       | 5 P
 | xoreq                  | 5 P           | 5 P         | 5 P       | 5 P
 | and_                   | 5 P           | 5 P         | 5 P       | 5 P
 | andeq                  | 5 P           | 5 P         | 5 P       | 5 P
 | or_                    | 5 P           | 5 P         | 5 P       | 5 P
 | oreq                   | 5 P           | 5 P         | 5 P       | 5 P
-| shl                    | 12 P          | 14          | 26        | 19
-| shleq                  | 12 P          | 14          | 26        | 19
-| shr                    | 12 P          | 14          | 27        | 19
-| shreq                  | 12 P          | 14          | 27        | 19
+| shl                    | 12 P          | 14          | 25        | 19
+| shleq                  | 12 P          | 14          | 25        | 19
+| shr                    | 12 P          | 14          | 26        | 19
+| shreq                  | 12 P          | 14          | 26        | 19
 | clz                    | 9             | 9           | 12        | 10
 | lt                     | 6 P           | 9           | 11        | 12
 | leq                    | 6 P           | 9           | 9         | 12
@@ -93,7 +93,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | neq                    | 7             | 7           | 7         | 7
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
 | bool_                  | 4 P           | 4 P         | 4 P       | 4 P
-| neg                    | 7             | 13          | 13        | 14
+| neg                    | 5             | 13          | 13        | 14
 | flip                   | 5             | 5           | 5         | 5
 
 
@@ -111,20 +111,20 @@ For my `Uint256` built from a pair of `Uint128`:
 | minuseq                | 9 P           | 12          | 23        | 22
 | mul                    | 60            | 74          | 62        | 84
 | muleq                  | 60            | 74          | 62        | 84
-| div                    | 177 call      | 166 call    | 258 call  | 225
-| diveq                  | 177 call      | 166 call    | 258 call  | 225
-| mod                    | 177 call      | 166 call    | 258 call  | 209
-| modeq                  | 170 call      | 160 call    | 251 call  | 214
+| div                    | 177 call      | 166 call    | 256 call  | 225
+| diveq                  | 177 call      | 166 call    | 256 call  | 225
+| mod                    | 177 call      | 166 call    | 256 call  | 209
+| modeq                  | 170 call      | 160 call    | 249 call  | 214
 | xor_                   | 9 P           | 9 P         | 9 P       | 9 P
 | xoreq                  | 9 P           | 9 P         | 9 P       | 9 P
 | and_                   | 9 P           | 9 P         | 9 P       | 9 P
 | andeq                  | 9 P           | 9 P         | 9 P       | 9 P
 | or_                    | 9 P           | 9 P         | 9 P       | 9 P
 | oreq                   | 9 P           | 9 P         | 9 P       | 9 P
-| shl                    | 28 P          | 39          | 67        | 60
-| shleq                  | 28 P          | 39          | 67        | 60
-| shr                    | 28 P          | 40          | 67        | 59
-| shreq                  | 28 P          | 40          | 67        | 59
+| shl                    | 28 P          | 39          | 62        | 60
+| shleq                  | 28 P          | 39          | 62        | 60
+| shr                    | 28 P          | 40          | 62        | 59
+| shreq                  | 28 P          | 40          | 62        | 59
 | clz                    | 21            | 21          | 32        | 25
 | lt                     | 10 P          | 18          | 21        | 19
 | leq                    | 10 P          | 18          | 21        | 19
@@ -134,5 +134,5 @@ For my `Uint256` built from a pair of `Uint128`:
 | neq                    | 13 P          | 17          | 13 P      | 13 P
 | not_                   | 9             | 6 P         | 6 P       | 6 P
 | bool_                  | 9             | 6 P         | 6 P       | 6 P
-| neg                    | 13            | 27          | 25        | 26
+| neg                    | 11            | 27          | 25        | 26
 | flip                   | 8             | 8           | 8         | 8
