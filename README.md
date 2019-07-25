@@ -111,20 +111,20 @@ For my `Uint256` built from a pair of `Uint128`:
 | minuseq                | 9 P           | 12          | 23        | 22
 | mul                    | 60            | 74          | 62        | 84
 | muleq                  | 60            | 74          | 62        | 84
-| div                    | 177 call      | 166 call    | 256 call  | 225
-| diveq                  | 177 call      | 166 call    | 256 call  | 225
-| mod                    | 177 call      | 166 call    | 256 call  | 209
-| modeq                  | 170 call      | 160 call    | 249 call  | 214
+| div                    | 177 call      | 166 call    | 233 call  | 225
+| diveq                  | 177 call      | 166 call    | 233 call  | 225
+| mod                    | 177 call      | 166 call    | 233 call  | 209
+| modeq                  | 170 call      | 160 call    | 226 call  | 214
 | xor_                   | 9 P           | 9 P         | 9 P       | 9 P
 | xoreq                  | 9 P           | 9 P         | 9 P       | 9 P
 | and_                   | 9 P           | 9 P         | 9 P       | 9 P
 | andeq                  | 9 P           | 9 P         | 9 P       | 9 P
 | or_                    | 9 P           | 9 P         | 9 P       | 9 P
 | oreq                   | 9 P           | 9 P         | 9 P       | 9 P
-| shl                    | 28 P          | 39          | 62        | 60
-| shleq                  | 28 P          | 39          | 62        | 60
-| shr                    | 28 P          | 40          | 62        | 59
-| shreq                  | 28 P          | 40          | 62        | 59
+| shl                    | 28 P          | 39          | 52        | 60
+| shleq                  | 28 P          | 39          | 52        | 60
+| shr                    | 28 P          | 40          | 53        | 59
+| shreq                  | 28 P          | 40          | 53        | 59
 | clz                    | 21            | 21          | 32        | 25
 | lt                     | 10 P          | 18          | 21        | 19
 | leq                    | 10 P          | 18          | 21        | 19
