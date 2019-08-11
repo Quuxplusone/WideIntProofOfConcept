@@ -49,7 +49,7 @@ def process(compiler_name, function_name, type_name, bypass):
         if (not text) or (text[0] in '_.'):
             pass
         elif 'call' in text:
-            print text, '## CALL!'
+            print (text, '## CALL!')
             linecount += 1
             if '__udivti3' in text:
                 linecount += 20000
@@ -58,7 +58,7 @@ def process(compiler_name, function_name, type_name, bypass):
             else:
                 linecount += 10000
         else:
-            print text
+            print (text)
             linecount += 1
 
     return linecount
@@ -118,8 +118,8 @@ def indicate_perfect_codegen(tn, fn, lc):
         (256, 'neg'): None,      (256, 'flip'): 5,
     }
     bitwidth = 128 if ('128' in tn) else 256 if ('256' in tn) else None
-    perfect_lc = perfect_dict.get((bitwidth, fn), 1)
-    assert lc >= perfect_lc
+    perfect_lc = perfect_dict.get((bitwidth, fn))
+    assert lc >= (perfect_lc or 1)
     if lc == perfect_lc:
         return '%d P' % lc
     elif 10000 <= lc < 20000:
@@ -147,23 +147,23 @@ if __name__ == '__main__':
         for tn in type_names:
             for cn in compiler_names:
                 linecount = process(cn, fn, tn, options.bypass)
-                print '%s/%s/%s: %s' % (tn, fn, cn, linecount)
+                print ('%s/%s/%s: %s' % (tn, fn, cn, linecount))
                 results.append((tn, fn, cn, linecount))
 
     for tn in type_names:
-        print {
+        print ({
             '__uint128_t': 'For the builtin `__uint128_t`:\n',
             'Uint128': 'For my `Uint128` built from a pair of `uint64_t`:\n',
             'Uint256': 'For my `Uint256` built from a pair of `Uint128`:\n',
-        }[tn]
-        print '| Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1'
-        print '| ---------------------- | ------------- | ----------- | --------- | -------'
+        }[tn])
+        print ('| Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1')
+        print ('| ---------------------- | ------------- | ----------- | --------- | -------')
         for fn in func_names:
-            print '| %-22s | %-13s | %-11s | %-9s | %s' % (
+            print ('| %-22s | %-13s | %-11s | %-9s | %s' % (
                 fn,
                 find_result(tn, fn, 'clang_trunk'),
                 find_result(tn, fn, 'clang500'),
                 find_result(tn, fn, 'gsnapshot'),
                 find_result(tn, fn, 'g6'),
-            )
-        print '\n'
+            ))
+        print ('\n')
