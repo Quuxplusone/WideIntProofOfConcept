@@ -60,35 +60,35 @@ For my `Uint128` built from a pair of `uint64_t`:
 
 | Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1
 | ---------------------- | ------------- | ----------- | --------- | -------
-| preinc                 | 3 P           | 5           | 5         | 5
-| postinc                | 11            | 13          | 15        | 13
-| predec                 | 3 P           | 8           | 8         | 10
-| postdec                | 11            | 13          | 15        | 13
+| preinc                 | 3 P           | 5           | 6         | 5
+| postinc                | 11            | 13          | 13        | 13
+| predec                 | 3 P           | 8           | 6         | 10
+| postdec                | 11            | 13          | 13        | 13
 | plus                   | 5 P           | 10          | 13        | 15
 | pluseq                 | 5 P           | 6           | 6         | 12
 | minus                  | 5 P           | 10          | 16        | 18
 | minuseq                | 5 P           | 6           | 11        | 12
 | mul                    | 11 P          | 11 P        | 11 P      | 11 P
 | muleq                  | 11 P          | 11 P        | 11 P      | 11 P
-| div                    | 39            | 57          | 87        | 82
-| diveq                  | 39            | 57          | 87        | 82
-| mod                    | 32            | 53          | 82        | 76
-| modeq                  | 32            | 52          | 75        | 79
+| div                    | 36            | 57          | 78        | 82
+| diveq                  | 36            | 57          | 78        | 82
+| mod                    | 32            | 53          | 72        | 76
+| modeq                  | 32            | 52          | 72        | 79
 | xor_                   | 5 P           | 5 P         | 5 P       | 5 P
 | xoreq                  | 5 P           | 5 P         | 5 P       | 5 P
 | and_                   | 5 P           | 5 P         | 5 P       | 5 P
 | andeq                  | 5 P           | 5 P         | 5 P       | 5 P
 | or_                    | 5 P           | 5 P         | 5 P       | 5 P
 | oreq                   | 5 P           | 5 P         | 5 P       | 5 P
-| shl                    | 12 P          | 14          | 25        | 19
-| shleq                  | 12 P          | 14          | 25        | 19
-| shr                    | 12 P          | 14          | 26        | 19
-| shreq                  | 12 P          | 14          | 26        | 19
+| shl                    | 12 P          | 14          | 26        | 19
+| shleq                  | 12 P          | 14          | 26        | 19
+| shr                    | 12 P          | 14          | 23        | 19
+| shreq                  | 12 P          | 14          | 23        | 19
 | clz                    | 9             | 9           | 12        | 10
 | lt                     | 6 P           | 9           | 11        | 12
-| leq                    | 6 P           | 9           | 9         | 12
-| gt                     | 6 P           | 9           | 9         | 12
-| geq                    | 6 P           | 9           | 9         | 12
+| leq                    | 6 P           | 9           | 11        | 12
+| gt                     | 6 P           | 9           | 11        | 12
+| geq                    | 6 P           | 9           | 11        | 12
 | eq                     | 7             | 7           | 7         | 7
 | neq                    | 7             | 7           | 7         | 7
 | not_                   | 4 P           | 4 P         | 4 P       | 4 P
@@ -109,12 +109,12 @@ For my `Uint256` built from a pair of `Uint128`:
 | pluseq                 | 9 P           | 12          | 18        | 21
 | minus                  | 9 P           | 24          | 30        | 26
 | minuseq                | 9 P           | 12          | 23        | 22
-| mul                    | 60            | 74          | 62        | 84
-| muleq                  | 60            | 74          | 62        | 84
-| div                    | 177 call      | 166 call    | 233 call  | 225
-| diveq                  | 177 call      | 166 call    | 233 call  | 225
-| mod                    | 177 call      | 166 call    | 233 call  | 209
-| modeq                  | 170 call      | 160 call    | 226 call  | 214
+| mul                    | 60            | 74          | 73        | 84
+| muleq                  | 60            | 74          | 73        | 84
+| div                    | 175 call      | 166 call    | 230 call  | 225
+| diveq                  | 175 call      | 166 call    | 230 call  | 225
+| mod                    | 175 call      | 166 call    | 230 call  | 209
+| modeq                  | 168 call      | 160 call    | 223 call  | 214
 | xor_                   | 9 P           | 9 P         | 9 P       | 9 P
 | xoreq                  | 9 P           | 9 P         | 9 P       | 9 P
 | and_                   | 9 P           | 9 P         | 9 P       | 9 P
@@ -123,8 +123,8 @@ For my `Uint256` built from a pair of `Uint128`:
 | oreq                   | 9 P           | 9 P         | 9 P       | 9 P
 | shl                    | 28 P          | 39          | 52        | 60
 | shleq                  | 28 P          | 39          | 52        | 60
-| shr                    | 28 P          | 40          | 53        | 59
-| shreq                  | 28 P          | 40          | 53        | 59
+| shr                    | 28 P          | 40          | 52        | 59
+| shreq                  | 28 P          | 40          | 52        | 59
 | clz                    | 21            | 21          | 32        | 25
 | lt                     | 10 P          | 18          | 21        | 19
 | leq                    | 10 P          | 18          | 21        | 19
