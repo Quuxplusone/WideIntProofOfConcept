@@ -84,7 +84,7 @@ For my `Uint128` built from a pair of `uint64_t`:
 | shleq                  | 12 P          | 14          | 26        | 19
 | shr                    | 12 P          | 14          | 23        | 19
 | shreq                  | 12 P          | 14          | 23        | 19
-| clz                    | 9             | 9           | 12        | 10
+| clz                    | 7             | 8           | 11        | 9
 | lt                     | 6 P           | 9           | 11        | 12
 | leq                    | 6 P           | 9           | 11        | 12
 | gt                     | 6 P           | 9           | 11        | 12
@@ -125,7 +125,7 @@ For my `Uint256` built from a pair of `Uint128`:
 | shleq                  | 28 P          | 39          | 52        | 60
 | shr                    | 28 P          | 40          | 52        | 59
 | shreq                  | 28 P          | 40          | 52        | 59
-| clz                    | 21            | 21          | 32        | 25
+| clz                    | 17            | 19          | 26        | 39
 | lt                     | 10 P          | 18          | 21        | 19
 | leq                    | 10 P          | 18          | 21        | 19
 | gt                     | 10 P          | 18          | 21        | 19

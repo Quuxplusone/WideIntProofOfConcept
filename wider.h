@@ -279,10 +279,11 @@ struct Wider {
     }
 
     friend int countleadingzeros(const Wider& x) {
-        constexpr int mask = bit_width - 1;
-        int lo = (mask ^ countleadingzeros(x.lo)) + bit_width;
-        int hi = mask ^ countleadingzeros(x.hi);
-        return mask ^ (x.hi ? hi : lo);
+        constexpr int _64 = bit_width/2;
+        constexpr int _63 = _64 - 1;
+        int lo = (_63 ^ countleadingzeros(x.lo)) + _64;
+        int hi = _63 ^ countleadingzeros(x.hi);
+        return _63 ^ ((x >> _64) ? hi : lo);
     }
 
     friend Wider divmod(Wider a, const Wider& b, Wider *remainder) {
