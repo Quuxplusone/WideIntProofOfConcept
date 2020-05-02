@@ -14,14 +14,14 @@ def process(compiler_name, function_name, type_name, bypass):
     for i, line in enumerate(source):
         if re.match(r'    //static .* %s[(]' % function_name, line):
             source[i] = re.sub(r'//', '', line)
-        elif re.match(r'//template struct Tests<%s>;' % type_name, line):
-            source[i] = re.sub(r'//', '', line)
+        elif line == '//template struct Tests<Uint128>;\n':
+            source[i] = 'template struct Tests<%s>;\n' % type_name
 
     r = requests.post(
         'https://godbolt.org/api/compiler/%s/compile' % compiler_name,
         json={
             "bypassCache": bypass,
-            "source": '\n'.join(source),
+            "source": ''.join(source),
             "options": {
                 "userArguments": "-std=c++14 -O3",
                 "compilerOptions": {},
@@ -63,25 +63,7 @@ def process(compiler_name, function_name, type_name, bypass):
 
     return linecount
 
-func_names = [
-    'preinc', 'postinc', 'predec', 'postdec',
-    'plus', 'pluseq', 'minus', 'minuseq',
-    'mul', 'muleq',
-    'div', 'diveq', 'mod', 'modeq',
-    'xor_', 'xoreq', 'and_', 'andeq', 'or_', 'oreq',
-    'shl', 'shleq', 'shr', 'shreq',
-    'clz',
-    'lt', 'leq', 'gt', 'geq', 'eq', 'neq',
-    'not_', 'bool_', 'neg', 'flip',
-]
-type_names = [
-    '__uint128_t', 'Uint128', 'Uint256',
-]
-compiler_names = [
-    'clang_trunk', 'gsnapshot', 'g6', 'clang500',
-]
-
-def indicate_perfect_codegen(tn, fn, lc):
+def indicate_perfect_codegen(r, c, lc):
     perfect_dict = {
         (128, 'preinc'): 3,      (128, 'postinc'): 5,
         (128, 'predec'): 3,      (128, 'postdec'): 5,
@@ -117,8 +99,7 @@ def indicate_perfect_codegen(tn, fn, lc):
         (256, 'not_'): 6,        (256, 'bool_'): 6,
         (256, 'neg'): None,      (256, 'flip'): 5,
     }
-    bitwidth = 128 if ('128' in tn) else 256 if ('256' in tn) else None
-    perfect_lc = perfect_dict.get((bitwidth, fn))
+    perfect_lc = perfect_dict.get((c.bitwidth, r.funcname))
     assert lc >= (perfect_lc or 1)
     if lc == perfect_lc:
         return '%d P' % lc
@@ -130,11 +111,93 @@ def indicate_perfect_codegen(tn, fn, lc):
         return '__umodti3'
     return '%d' % lc
 
-def find_result(tn, fn, cn):
+def find_result(r, c):
     for tn2, fn2, cn2, lc in results:
-        if (tn2, fn2, cn2) == (tn, fn, cn):
-            return indicate_perfect_codegen(tn, fn, lc)
+        if (tn2, fn2, cn2) == (c.typename, r.funcname, c.compiler):
+            return indicate_perfect_codegen(r, c, lc)
     return None
+
+
+class Row:
+    def __init__(self, funcname):
+        self.funcname = funcname
+
+class Column:
+    def __init__(self, title, compiler, typename):
+        self.title = title
+        self.compiler = compiler
+        self.typename = typename
+        self.width = len(self.title)
+
+class Table:
+    def __init__(self, bitwidth, caption, columns):
+        self.caption = caption
+        self.columns = columns
+        for c in self.columns:
+            c.bitwidth = bitwidth
+
+    def precompute(self, options, rows):
+        result = []
+        for r in rows:
+            for c in self.columns:
+                cn = c.compiler
+                fn = r.funcname
+                tn = c.typename
+                linecount = process(cn, fn, tn, options.bypass)
+                print('%s/%s/%s: %s' % (tn, fn, cn, linecount))
+                result.append((tn, fn, cn, linecount))
+        return result
+
+    def produce(self, rows):
+        result = self.caption + '\n\n'
+        result += '| Test name  | ' + ' | '.join([c.title for c in self.columns]) + ' |\n'
+        result += '| ---------- | ' + ' | '.join([('-' * c.width) for c in self.columns]) + ' |\n'
+        for r in rows:
+            result += '| ' + r.funcname.ljust(10) + ' | '
+            result += ' | '.join([
+                find_result(r, c).ljust(c.width)
+                for c in self.columns
+            ])
+            result += ' |\n'
+        return result
+
+all_tables = [
+    Table(
+        128, '128-bit math using `__uint128_t`, `unsigned _ExtInt(128)`, and `Wider<uint64_t>`:', [
+            Column('Clang `uint128`', 'clang_trunk', '__uint128_t'),
+            Column('Clang `_ExtInt`', 'clang_trunk', 'unsigned _ExtInt(128)'),
+            Column('Clang `W<u64>`', 'clang_trunk', 'Wider<uint64_t>'),
+            Column('GCC `uint128`', 'gsnapshot', '__uint128_t'),
+            Column('GCC `W<u64>`', 'gsnapshot', 'Wider<uint64_t>'),
+        ]
+    ),
+    Table(
+        256, '256-bit math using `unsigned _ExtInt(256)` and `Wider<Wider<uint64_t>>`:', [
+            Column('Clang `_ExtInt`', 'clang_trunk', 'unsigned _ExtInt(256)'),
+            Column('Clang `W<W<u64>>`', 'clang_trunk', 'Wider<Wider<uint64_t>>'),
+            Column('GCC `W<W<u64>>`', 'gsnapshot', 'Wider<Wider<uint64_t>>'),
+        ]
+    ),
+    Table(
+        512, '512-bit math using `unsigned _ExtInt(512)` and `Wider<Wider<Wider<uint64_t>>>`:', [
+            Column('Clang `_ExtInt`', 'clang_trunk', 'unsigned _ExtInt(512)'),
+            Column('Clang `W<W<W<u64>>>`', 'clang_trunk', 'Wider<Wider<Wider<uint64_t>>>'),
+            Column('GCC `W<W<W<u64>>>`', 'gsnapshot', 'Wider<Wider<Wider<uint64_t>>>'),
+        ]
+    ),
+]
+
+all_rows = [Row(x) for x in [
+    'preinc', 'postinc', 'predec', 'postdec',
+    'plus', 'pluseq', 'minus', 'minuseq',
+    'mul', 'muleq',
+    'div', 'diveq', 'mod', 'modeq',
+    'xor_', 'xoreq', 'and_', 'andeq', 'or_', 'oreq',
+    'shl', 'shleq', 'shr', 'shreq',
+    'clz',
+    'lt', 'leq', 'gt', 'geq', 'eq', 'neq',
+    'not_', 'bool_', 'neg', 'flip',
+]]
 
 
 if __name__ == '__main__':
@@ -143,27 +206,8 @@ if __name__ == '__main__':
     options = parser.parse_args()
 
     results = []
-    for fn in func_names:
-        for tn in type_names:
-            for cn in compiler_names:
-                linecount = process(cn, fn, tn, options.bypass)
-                print ('%s/%s/%s: %s' % (tn, fn, cn, linecount))
-                results.append((tn, fn, cn, linecount))
+    for table in all_tables:
+        results += table.precompute(options, all_rows)
 
-    for tn in type_names:
-        print ({
-            '__uint128_t': 'For the builtin `__uint128_t`:\n',
-            'Uint128': 'For my `Uint128` built from a pair of `uint64_t`:\n',
-            'Uint256': 'For my `Uint256` built from a pair of `Uint128`:\n',
-        }[tn])
-        print ('| Test name              |  Clang trunk  | Clang 5.0.0 | GCC trunk | GCC 6.1')
-        print ('| ---------------------- | ------------- | ----------- | --------- | -------')
-        for fn in func_names:
-            print ('| %-22s | %-13s | %-11s | %-9s | %s' % (
-                fn,
-                find_result(tn, fn, 'clang_trunk'),
-                find_result(tn, fn, 'clang500'),
-                find_result(tn, fn, 'gsnapshot'),
-                find_result(tn, fn, 'g6'),
-            ))
-        print ('\n')
+    for table in all_tables:
+        print(table.produce(all_rows), '\n')
