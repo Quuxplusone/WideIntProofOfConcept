@@ -29,6 +29,7 @@ resulting in smaller code but almost certainly slower code in common situations.
 
 All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, on GCC trunk and Clang trunk.
 
+128-bit math using `__uint128_t`, `unsigned _ExtInt(128)`, and `Wider<uint64_t>`:
 
 | Test name  | Clang `uint128` | Clang `_ExtInt` | Clang `W<u64>` | GCC `uint128` | GCC `W<u64>` |
 | ---------- | --------------- | --------------- | -------------- | ------------- | ------------ |
@@ -40,12 +41,12 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, o
 | pluseq     | 5 P             | 5 P             | 5 P            | 5 P           | 6            |
 | minus      | 5 P             | 5 P             | 5 P            | 5 P           | 16           |
 | minuseq    | 5 P             | 5 P             | 5 P            | 5 P           | 11           |
-| mul        | 11 P            | 11 P            | 11 P           | 12            | 12           |
-| muleq      | 11 P            | 11 P            | 11 P           | 12            | 12           |
-| div        | __udivti3       | __udivti3       | 49             | __udivti3     | 81           |
-| diveq      | __udivti3       | __udivti3       | 49             | __udivti3     | 81           |
-| mod        | __umodti3       | __umodti3       | 39             | __umodti3     | 72           |
-| modeq      | __umodti3       | __umodti3       | 39             | __umodti3     | 72           |
+| mul        | 11 P            | 11 P            | 11 P           | 11 P          | 11 P         |
+| muleq      | 11 P            | 11 P            | 11 P           | 11 P          | 11 P         |
+| div        | __udivti3       | __udivti3       | 48             | __udivti3     | 81           |
+| diveq      | __udivti3       | __udivti3       | 48             | __udivti3     | 81           |
+| mod        | __umodti3       | __umodti3       | 39             | __umodti3     | 75           |
+| modeq      | __umodti3       | __umodti3       | 39             | __umodti3     | 82           |
 | xor_       | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
 | xoreq      | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
 | and_       | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
@@ -78,26 +79,26 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, o
 | predec     | 5 P             | 5 P               | 17              |
 | postdec    | 23              | 13                | 30              |
 | plus       | 9 P             | 9 P               | 26              |
-| pluseq     | 9 P             | 9 P               | 18              |
-| minus      | 9 P             | 9 P               | 30              |
-| minuseq    | 9 P             | 9 P               | 23              |
+| pluseq     | 9 P             | 9 P               | 19              |
+| minus      | 9 P             | 9 P               | 31              |
+| minuseq    | 9 P             | 9 P               | 24              |
 | mul        | 60              | 60                | 67              |
 | muleq      | 62              | 60                | 67              |
-| div        | unsupported     | 174 call          | 227 call        |
-| diveq      | unsupported     | 174 call          | 227 call        |
-| mod        | unsupported     | 174 call          | 227 call        |
-| modeq      | unsupported     | 167 call          | 220 call        |
+| div        | unsupported     | 174 call          | 229 call        |
+| diveq      | unsupported     | 174 call          | 229 call        |
+| mod        | unsupported     | 174 call          | 229 call        |
+| modeq      | unsupported     | 167 call          | 222 call        |
 | xor_       | 9 P             | 9 P               | 9 P             |
 | xoreq      | 9 P             | 9 P               | 9 P             |
 | and_       | 9 P             | 9 P               | 9 P             |
 | andeq      | 9 P             | 9 P               | 9 P             |
 | or_        | 9 P             | 9 P               | 9 P             |
 | oreq       | 9 P             | 9 P               | 9 P             |
-| shl        | 64              | 28 P              | 52              |
-| shleq      | 64              | 28 P              | 52              |
-| shr        | 61              | 28 P              | 53              |
-| shreq      | 61              | 28 P              | 53              |
-| clz        | unsupported     | 17                | 27              |
+| shl        | 64              | 28 P              | 54              |
+| shleq      | 64              | 28 P              | 54              |
+| shr        | 61              | 28 P              | 55              |
+| shreq      | 61              | 28 P              | 55              |
+| clz        | unsupported     | 17                | 26              |
 | lt         | 10 P            | 10 P              | 21              |
 | leq        | 10 P            | 10 P              | 21              |
 | gt         | 10 P            | 10 P              | 21              |
@@ -115,15 +116,15 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, o
 | Test name  | Clang `_ExtInt` | Clang `W<W<W<u64>>>` | GCC `W<W<W<u64>>>` |
 | ---------- | --------------- | -------------------- | ------------------ |
 | preinc     | 9               | 9                    | 33                 |
-| postinc    | 45              | 25                   | 67                 |
+| postinc    | 45              | 25                   | 69                 |
 | predec     | 9               | 9                    | 37                 |
-| postdec    | 45              | 25                   | 68                 |
-| plus       | 17              | 17                   | 54                 |
-| pluseq     | 17              | 17                   | 38                 |
-| minus      | 17              | 17                   | 58                 |
-| minuseq    | 17              | 17                   | 43                 |
-| mul        | 274             | __udivti3            | 320                |
-| muleq      | 275             | __udivti3            | 320                |
+| postdec    | 45              | 25                   | 70                 |
+| plus       | 17              | 17                   | 56                 |
+| pluseq     | 17              | 17                   | 39                 |
+| minus      | 17              | 17                   | 60                 |
+| minuseq    | 17              | 17                   | 45                 |
+| mul        | 274             | __udivti3            | 325                |
+| muleq      | 275             | __udivti3            | 325                |
 | div        | unsupported     | 384 call             | 526 call           |
 | diveq      | unsupported     | 384 call             | 526 call           |
 | mod        | unsupported     | 384 call             | 526 call           |
@@ -134,17 +135,17 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, o
 | andeq      | 17              | 17                   | 17                 |
 | or_        | 17              | 17                   | 17                 |
 | oreq       | 17              | 17                   | 17                 |
-| shl        | 347             | 67                   | 129                |
-| shleq      | 347             | 67                   | 129                |
-| shr        | 362             | 72                   | 142                |
-| shreq      | 362             | 72                   | 142                |
-| clz        | unsupported     | 39                   | 64                 |
-| lt         | 18              | 18                   | 41                 |
-| leq        | 18              | 18                   | 41                 |
-| gt         | 18              | 18                   | 41                 |
-| geq        | 18              | 18                   | 41                 |
-| eq         | 25              | 21                   | 25                 |
-| neq        | 25              | 21                   | 25                 |
+| shl        | 347             | 67                   | 131                |
+| shleq      | 347             | 67                   | 131                |
+| shr        | 362             | 72                   | 138                |
+| shreq      | 362             | 72                   | 138                |
+| clz        | unsupported     | 39                   | 62                 |
+| lt         | 18              | 18                   | 42                 |
+| leq        | 18              | 18                   | 43                 |
+| gt         | 18              | 18                   | 43                 |
+| geq        | 18              | 18                   | 42                 |
+| eq         | 25              | 21                   | 26                 |
+| neq        | 25              | 21                   | 26                 |
 | not_       | 13              | 13                   | 10                 |
 | bool_      | 13              | 13                   | 10                 |
 | neg        | 23              | 23                   | 49                 |

@@ -5,7 +5,9 @@
 #include <type_traits>
 #include <utility>
 
-#ifdef _MSC_VER
+#if WIDER_COMPLETELY_STANDARD
+// do nothing
+#elif defined(_MSC_VER)
 #include <intrin.h>
 #else // _MSC_VER
 #include <x86intrin.h>
@@ -59,7 +61,13 @@ inline CarryFlag producecarry(uint64_t& x, uint64_t y) {
 }
 
 inline CarryFlag addcarry(CarryFlag cf, uint64_t& x, uint64_t y) {
+#if WIDER_COMPLETELY_STANDARD
+    CarryFlag r1 = producecarry(x, y);
+    CarryFlag r2 = producecarry(x, cf);
+    return r1 || r2;
+#else
     return _addcarry_u64(cf, x, y, (unsigned long long*)&x);
+#endif
 }
 
 inline CarryFlag produceborrow(uint64_t& x, uint64_t y) {
@@ -69,11 +77,17 @@ inline CarryFlag produceborrow(uint64_t& x, uint64_t y) {
 }
 
 inline CarryFlag subborrow(CarryFlag cf, uint64_t& x, uint64_t y) {
+#if WIDER_COMPLETELY_STANDARD
+    CarryFlag r1 = produceborrow(x, y);
+    CarryFlag r2 = produceborrow(x, cf);
+    return r1 || r2;
+#else
     return _subborrow_u64(cf, x, y, (unsigned long long*)&x);
+#endif
 }
 
 inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
-#if defined(WIDER_COMPLETELY_STANDARD)
+#if WIDER_COMPLETELY_STANDARD
     auto hi = [](uint64_t x) { return x >> 32; };
     auto lo = [](uint64_t x) { return uint32_t(x); };
     uint64_t xl = lo(a);
@@ -100,7 +114,14 @@ inline uint64_t mulxu(uint64_t a, uint64_t b, uint64_t *rhi) {
 }
 
 inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
-#ifdef _MSC_VER
+#if WIDER_COMPLETELY_STANDARD
+    n &= 63;
+    if (n != 0) {
+        return (high << n) | (low >> (64-n));
+    } else {
+        return high;
+    }
+#elif defined(_MSC_VER)
     return __shiftleft128(low, high, n);
 #else
     __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
@@ -109,7 +130,14 @@ inline uint64_t shl128(uint64_t low, uint64_t high, int n) {
 }
 
 inline uint64_t shr128(uint64_t low, uint64_t high, int n) {
-#ifdef _MSC_VER
+#if WIDER_COMPLETELY_STANDARD
+    n &= 63;
+    if (n != 0) {
+        return (low >> n) | (high << (64-n));
+    } else {
+        return low;
+    }
+#elif defined(_MSC_VER)
     return __shiftright128(low, high, n);
 #else
     __uint128_t v = (__uint128_t(high) << 64) | __uint128_t(low);
@@ -118,7 +146,14 @@ inline uint64_t shr128(uint64_t low, uint64_t high, int n) {
 }
 
 inline int countleadingzeros(uint64_t x) {
-#ifdef _MSC_VER
+#if WIDER_COMPLETELY_STANDARD
+    int r = 0;
+    while ((x & 0x8000000000000000uLL) == 0) {
+        x <<= 1;
+        ++r;
+    }
+    return r;
+#elif defined(_MSC_VER)
     return __lzcnt64(x);
 #else
     return __builtin_clzll(x);
