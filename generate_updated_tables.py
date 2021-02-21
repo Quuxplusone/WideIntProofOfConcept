@@ -44,6 +44,9 @@ def process(compiler_name, function_name, type_name, bypass):
     )
 
     linecount = 0
+    has_call = False
+    has_udivti = False
+    has_umodti = False
     for line in r.json()['asm']:
         text = line['text']
         if (not text) or (text[0] in '_.'):
@@ -51,15 +54,21 @@ def process(compiler_name, function_name, type_name, bypass):
         elif 'call' in text:
             print (text, '## CALL!')
             linecount += 1
+            has_call = True
             if '__udivti3' in text:
-                linecount += 20000
+                has_udivti = True
             elif '__umodti3' in text:
-                linecount += 30000
-            else:
-                linecount += 10000
+                has_umodti = True
         else:
             print (text)
             linecount += 1
+
+    if has_umodti:
+        linecount += 30000
+    elif has_udivti:
+        linecount += 20000
+    elif has_call:
+        linecount += 10000
 
     return linecount
 
@@ -90,8 +99,8 @@ def indicate_perfect_codegen(r, c, lc):
         (256, 'xor_'): 9,        (256, 'xoreq'): 9,
         (256, 'and_'): 9,        (256, 'andeq'): 9,
         (256, 'or_'): 9,         (256, 'oreq'): 9,
-        (256, 'shl'): 28,        (256, 'shleq'): 28,
-        (256, 'shr'): 28,        (256, 'shreq'): 28,
+        (256, 'shl'): 26,        (256, 'shleq'): 26,
+        (256, 'shr'): 26,        (256, 'shreq'): 26,
         (256, 'clz'): None,
         (256, 'lt'): 10,         (256, 'leq'): 10,
         (256, 'gt'): 10,         (256, 'geq'): 10,
@@ -100,8 +109,10 @@ def indicate_perfect_codegen(r, c, lc):
         (256, 'neg'): None,      (256, 'flip'): 5,
     }
     perfect_lc = perfect_dict.get((c.bitwidth, r.funcname))
-    assert lc >= (perfect_lc or 1)
-    if lc == perfect_lc:
+    if lc < (perfect_lc or 1):
+        print('Uh-oh! %d is less than the perfect %d for %d/%s' % (lc, (perfect_lc or 1), c.bitwidth, r.funcname))
+        assert False
+    elif lc == perfect_lc:
         return '%d P' % lc
     elif 10000 <= lc < 20000:
         return '%d call' % (lc - 10000)
