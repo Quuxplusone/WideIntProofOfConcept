@@ -174,9 +174,9 @@ class Table:
 
 all_tables = [
     Table(
-        128, '128-bit math using `__uint128_t`, `unsigned _ExtInt(128)`, and `Wider<uint64_t>`:', [
+        128, '128-bit math using `__uint128_t`, `unsigned _BitInt(128)`, and `Wider<uint64_t>`:', [
             Column('Clang `uint128`', 'clang_trunk', '__uint128_t'),
-            Column('Clang `_ExtInt`', 'clang_trunk', 'unsigned _ExtInt(128)'),
+            Column('Clang `_BitInt`', 'clang_trunk', 'unsigned _BitInt(128)'),
             Column('Clang `W<u64>`', 'clang_trunk', 'Wider<uint64_t>'),
             Column('GCC `uint128`', 'gsnapshot', '__uint128_t'),
             Column('GCC `W<u64>`', 'gsnapshot', 'Wider<uint64_t>'),
@@ -184,14 +184,14 @@ all_tables = [
     ),
     Table(
         256, '256-bit math using `unsigned _ExtInt(256)` and `Wider<Wider<uint64_t>>`:', [
-            Column('Clang `_ExtInt`', 'clang_trunk', 'unsigned _ExtInt(256)'),
+            Column('Clang 13 `_ExtInt`', 'clang1301', 'unsigned _ExtInt(256)'),
             Column('Clang `W<W<u64>>`', 'clang_trunk', 'Wider<Wider<uint64_t>>'),
             Column('GCC `W<W<u64>>`', 'gsnapshot', 'Wider<Wider<uint64_t>>'),
         ]
     ),
     Table(
         512, '512-bit math using `unsigned _ExtInt(512)` and `Wider<Wider<Wider<uint64_t>>>`:', [
-            Column('Clang `_ExtInt`', 'clang_trunk', 'unsigned _ExtInt(512)'),
+            Column('Clang 13 `_ExtInt`', 'clang1301', 'unsigned _ExtInt(512)'),
             Column('Clang `W<W<W<u64>>>`', 'clang_trunk', 'Wider<Wider<Wider<uint64_t>>>'),
             Column('GCC `W<W<W<u64>>>`', 'gsnapshot', 'Wider<Wider<Wider<uint64_t>>>'),
         ]

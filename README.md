@@ -29,9 +29,9 @@ resulting in smaller code but almost certainly slower code in common situations.
 
 All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, on GCC trunk and Clang trunk.
 
-128-bit math using `__uint128_t`, `unsigned _ExtInt(128)`, and `Wider<uint64_t>`:
+128-bit math using `__uint128_t`, `unsigned _BitInt(128)`, and `Wider<uint64_t>`:
 
-| Test name  | Clang `uint128` | Clang `_ExtInt` | Clang `W<u64>` | GCC `uint128` | GCC `W<u64>` |
+| Test name  | Clang `uint128` | Clang `_BitInt` | Clang `W<u64>` | GCC `uint128` | GCC `W<u64>` |
 | ---------- | --------------- | --------------- | -------------- | ------------- | ------------ |
 | preinc     | 3 P             | 3 P             | 3 P            | 3 P           | 6            |
 | postinc    | 11              | 11              | 11             | 11            | 12           |
@@ -39,29 +39,29 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, o
 | postdec    | 11              | 11              | 11             | 11            | 13           |
 | plus       | 5 P             | 5 P             | 5 P            | 5 P           | 11           |
 | pluseq     | 5 P             | 5 P             | 5 P            | 5 P           | 6            |
-| minus      | 5 P             | 5 P             | 5 P            | 5 P           | 16           |
-| minuseq    | 5 P             | 5 P             | 5 P            | 5 P           | 11           |
-| mul        | 11 P            | 11 P            | 11 P           | 11 P          | 13           |
-| muleq      | 11 P            | 11 P            | 11 P           | 11 P          | 13           |
-| div        | __udivti3       | __udivti3       | 48             | __udivti3     | 64           |
-| diveq      | __udivti3       | __udivti3       | 48             | __udivti3     | 64           |
-| mod        | __umodti3       | __umodti3       | 39             | __umodti3     | 57           |
-| modeq      | __umodti3       | __umodti3       | 39             | __umodti3     | 66           |
-| xor_       | 5 P             | 5 P             | 5 P            | 7             | 5 P          |
-| xoreq      | 5 P             | 5 P             | 5 P            | 7             | 5 P          |
-| and_       | 5 P             | 5 P             | 5 P            | 7             | 5 P          |
-| andeq      | 5 P             | 5 P             | 5 P            | 7             | 5 P          |
-| or_        | 5 P             | 5 P             | 5 P            | 7             | 5 P          |
-| oreq       | 5 P             | 5 P             | 5 P            | 7             | 5 P          |
-| shl        | 13              | 13              | 12 P           | 12 P          | 25           |
-| shleq      | 13              | 13              | 12 P           | 12 P          | 25           |
+| minus      | 5 P             | 5 P             | 5 P            | 5 P           | 14           |
+| minuseq    | 5 P             | 5 P             | 5 P            | 5 P           | 9            |
+| mul        | 11 P            | 11 P            | 11 P           | 11 P          | 11 P         |
+| muleq      | 11 P            | 11 P            | 11 P           | 11 P          | 11 P         |
+| div        | __udivti3       | __udivti3       | 47             | __udivti3     | 57           |
+| diveq      | __udivti3       | __udivti3       | 47             | __udivti3     | 57           |
+| mod        | __umodti3       | __umodti3       | 38             | __umodti3     | 53           |
+| modeq      | __umodti3       | __umodti3       | 38             | __umodti3     | 53           |
+| xor_       | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
+| xoreq      | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
+| and_       | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
+| andeq      | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
+| or_        | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
+| oreq       | 5 P             | 5 P             | 5 P            | 5 P           | 5 P          |
+| shl        | 13              | 13              | 12 P           | 12 P          | 24           |
+| shleq      | 13              | 13              | 12 P           | 12 P          | 24           |
 | shr        | 13              | 13              | 12 P           | 12 P          | 23           |
 | shreq      | 13              | 13              | 12 P           | 12 P          | 23           |
-| clz        | 7               | unsupported     | 7              | 11            | 11           |
-| lt         | 6 P             | 6 P             | 6 P            | 6 P           | 11           |
-| leq        | 6 P             | 6 P             | 6 P            | 7             | 11           |
-| gt         | 6 P             | 6 P             | 6 P            | 7             | 11           |
-| geq        | 6 P             | 6 P             | 6 P            | 6 P           | 11           |
+| clz        | 7               | 1               | 7              | 13            | 11           |
+| lt         | 6 P             | 6 P             | 6 P            | 6 P           | 9            |
+| leq        | 6 P             | 6 P             | 6 P            | 7             | 9            |
+| gt         | 6 P             | 6 P             | 6 P            | 7             | 9            |
+| geq        | 6 P             | 6 P             | 6 P            | 6 P           | 9            |
 | eq         | 6 P             | 7               | 7              | 7             | 7            |
 | neq        | 6 P             | 7               | 7              | 7             | 7            |
 | not_       | 4 P             | 4 P             | 4 P            | 4 P           | 4 P          |
@@ -72,81 +72,81 @@ All numbers are produced by Godbolt Compiler Explorer, using `-O3 -std=c++14`, o
 
 256-bit math using `unsigned _ExtInt(256)` and `Wider<Wider<uint64_t>>`:
 
-| Test name  | Clang `_ExtInt` | Clang `W<W<u64>>` | GCC `W<W<u64>>` |
-| ---------- | --------------- | ----------------- | --------------- |
-| preinc     | 5 P             | 5 P               | 11              |
-| postinc    | 23              | 13                | 18              |
-| predec     | 5 P             | 5 P               | 15              |
-| postdec    | 23              | 13                | 20              |
-| plus       | 9 P             | 9 P               | 20              |
-| pluseq     | 9 P             | 9 P               | 13              |
-| minus      | 9 P             | 9 P               | 27              |
-| minuseq    | 9 P             | 9 P               | 20              |
-| mul        | 60              | 60                | 67              |
-| muleq      | 62              | 60                | 67              |
-| div        | unsupported     | 170 call          | 216 call        |
-| diveq      | unsupported     | 170 call          | 216 call        |
-| mod        | unsupported     | 170 call          | 216 call        |
-| modeq      | unsupported     | 163 call          | 209 call        |
-| xor_       | 9 P             | 9 P               | 9 P             |
-| xoreq      | 9 P             | 9 P               | 9 P             |
-| and_       | 9 P             | 9 P               | 9 P             |
-| andeq      | 9 P             | 9 P               | 9 P             |
-| or_        | 9 P             | 9 P               | 9 P             |
-| oreq       | 9 P             | 9 P               | 9 P             |
-| shl        | 64              | 32                | 51              |
-| shleq      | 64              | 32                | 51              |
-| shr        | 61              | 26 P              | 53              |
-| shreq      | 61              | 26 P              | 53              |
-| clz        | unsupported     | 17                | 29              |
-| lt         | 10 P            | 10 P              | 17              |
-| leq        | 10 P            | 10 P              | 17              |
-| gt         | 10 P            | 10 P              | 17              |
-| geq        | 10 P            | 10 P              | 17              |
-| eq         | 13 P            | 13 P              | 13 P            |
-| neq        | 13 P            | 13 P              | 13 P            |
-| not_       | 7               | 9                 | 6 P             |
-| bool_      | 7               | 9                 | 6 P             |
-| neg        | 11              | 11                | 21              |
-| flip       | 5 P             | 8                 | 8               |
+| Test name  | Clang 13 `_ExtInt` | Clang `W<W<u64>>` | GCC `W<W<u64>>` |
+| ---------- | ------------------ | ----------------- | --------------- |
+| preinc     | 5 P                | 5 P               | 11              |
+| postinc    | 23                 | 13                | 18              |
+| predec     | 5 P                | 5 P               | 15              |
+| postdec    | 23                 | 13                | 20              |
+| plus       | 9 P                | 9 P               | 20              |
+| pluseq     | 9 P                | 9 P               | 13              |
+| minus      | 9 P                | 9 P               | 24              |
+| minuseq    | 9 P                | 9 P               | 17              |
+| mul        | 60                 | 63                | 64              |
+| muleq      | 62                 | 63                | 64              |
+| div        | 1                  | 173 call          | 216 call        |
+| diveq      | 1                  | 173 call          | 216 call        |
+| mod        | 1                  | 173 call          | 198             |
+| modeq      | 1                  | 166 call          | 198             |
+| xor_       | 9 P                | 9 P               | 9 P             |
+| xoreq      | 9 P                | 9 P               | 9 P             |
+| and_       | 9 P                | 9 P               | 9 P             |
+| andeq      | 9 P                | 9 P               | 9 P             |
+| or_        | 9 P                | 9 P               | 9 P             |
+| oreq       | 9 P                | 9 P               | 9 P             |
+| shl        | 64                 | 30                | 60              |
+| shleq      | 64                 | 30                | 60              |
+| shr        | 61                 | 33                | 64              |
+| shreq      | 61                 | 33                | 64              |
+| clz        | 1                  | 17                | 29              |
+| lt         | 10 P               | 10 P              | 15              |
+| leq        | 10 P               | 10 P              | 15              |
+| gt         | 10 P               | 10 P              | 15              |
+| geq        | 10 P               | 10 P              | 15              |
+| eq         | 13 P               | 13 P              | 13 P            |
+| neq        | 13 P               | 13 P              | 13 P            |
+| not_       | 7                  | 9                 | 6 P             |
+| bool_      | 7                  | 9                 | 6 P             |
+| neg        | 11                 | 11                | 21              |
+| flip       | 5 P                | 8                 | 8               |
  
 
 512-bit math using `unsigned _ExtInt(512)` and `Wider<Wider<Wider<uint64_t>>>`:
 
-| Test name  | Clang `_ExtInt` | Clang `W<W<W<u64>>>` | GCC `W<W<W<u64>>>` |
-| ---------- | --------------- | -------------------- | ------------------ |
-| preinc     | 9               | 9                    | 23                 |
-| postinc    | 45              | 25                   | 35                 |
-| predec     | 9               | 9                    | 27                 |
-| postdec    | 45              | 25                   | 38                 |
-| plus       | 17              | 17                   | 42                 |
-| pluseq     | 17              | 17                   | 25                 |
-| minus      | 17              | 17                   | 48                 |
-| minuseq    | 17              | 17                   | 33                 |
-| mul        | 274             | 324 call             | 305                |
-| muleq      | 275             | 324 call             | 305                |
-| div        | unsupported     | 455 call             | 474 call           |
-| diveq      | unsupported     | 455 call             | 474 call           |
-| mod        | unsupported     | 455 call             | 474 call           |
-| modeq      | unsupported     | 444 call             | 463 call           |
-| xor_       | 17              | 17                   | 17                 |
-| xoreq      | 17              | 17                   | 17                 |
-| and_       | 17              | 17                   | 17                 |
-| andeq      | 17              | 17                   | 17                 |
-| or_        | 17              | 17                   | 17                 |
-| oreq       | 17              | 17                   | 17                 |
-| shl        | 347             | 139 call             | 116                |
-| shleq      | 347             | 139 call             | 116                |
-| shr        | 362             | 63                   | 140                |
-| shreq      | 362             | 63                   | 140                |
-| clz        | unsupported     | 39                   | 68                 |
-| lt         | 18              | 18                   | 30                 |
-| leq        | 18              | 18                   | 31                 |
-| gt         | 18              | 18                   | 31                 |
-| geq        | 18              | 18                   | 30                 |
-| eq         | 25              | 21                   | 26                 |
-| neq        | 25              | 21                   | 26                 |
-| not_       | 13              | 13                   | 10                 |
-| bool_      | 13              | 13                   | 10                 |
-| neg        | 23              | 23                   | 37                 |
-| flip       | 9               | 14                   | 14                 |
+| Test name  | Clang 13 `_ExtInt` | Clang `W<W<W<u64>>>` | GCC `W<W<W<u64>>>` |
+| ---------- | ------------------ | -------------------- | ------------------ |
+| preinc     | 9                  | 9                    | 23                 |
+| postinc    | 45                 | 25                   | 35                 |
+| predec     | 9                  | 9                    | 27                 |
+| postdec    | 45                 | 25                   | 38                 |
+| plus       | 17                 | 17                   | 42                 |
+| pluseq     | 17                 | 17                   | 25                 |
+| minus      | 17                 | 17                   | 46                 |
+| minuseq    | 17                 | 17                   | 31                 |
+| mul        | 274                | 300 call             | 258                |
+| muleq      | 275                | 300 call             | 258                |
+| div        | 1                  | 467 call             | 512 call           |
+| diveq      | 1                  | 467 call             | 512 call           |
+| mod        | 1                  | 467 call             | 473                |
+| modeq      | 1                  | 456 call             | 479 call           |
+| xor_       | 17                 | 17                   | 17                 |
+| xoreq      | 17                 | 17                   | 17                 |
+| and_       | 17                 | 17                   | 17                 |
+| andeq      | 17                 | 17                   | 17                 |
+| or_        | 17                 | 17                   | 17                 |
+| oreq       | 17                 | 17                   | 17                 |
+| shl        | 347                | 133 call             | 137                |
+| shleq      | 347                | 133 call             | 137                |
+| shr        | 362                | 79                   | 168                |
+| shreq      | 362                | 79                   | 168                |
+| clz        | 1                  | 39                   | 71                 |
+| lt         | 18                 | 18                   | 28                 |
+| leq        | 18                 | 18                   | 29                 |
+| gt         | 18                 | 18                   | 29                 |
+| geq        | 18                 | 18                   | 28                 |
+| eq         | 25                 | 21                   | 26                 |
+| neq        | 25                 | 21                   | 26                 |
+| not_       | 13                 | 13                   | 10                 |
+| bool_      | 13                 | 13                   | 10                 |
+| neg        | 23                 | 23                   | 37                 |
+| flip       | 9                  | 14                   | 14                 |
