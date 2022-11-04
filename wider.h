@@ -277,7 +277,7 @@ struct Wider {
 
     friend Wider operator<<(const Wider& a, int n) {
         return wider_traits::array_helper<Wider>::with_array(a, [n](auto... parts) {
-            shift_left(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
+            Wider::shift_left(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
             uint64_t *ps[] = { &parts... };
             for (int shift = 1; shift < int(sizeof...(parts)); shift *= 2) {
                 if (n & (shift * 64)) {
@@ -296,7 +296,7 @@ struct Wider {
 
     friend Wider operator>>(const Wider& a, int n) {
         return wider_traits::array_helper<Wider>::with_array(a, [n](auto... parts) {
-            shift_right(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
+            Wider::shift_right(n, std::make_index_sequence<sizeof...(parts) - 1>(), parts...);
             uint64_t *ps[] = { &parts... };
             for (int shift = 1; shift < int(sizeof...(parts)); shift *= 2) {
                 if (n & (shift * 64)) {
